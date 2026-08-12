@@ -1,26 +1,155 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Design tokens — tema fixo, escuro, inspirado numa tela de PC de Pokémon /
+   terminal de laboratório. Os tokens --color-* viram automaticamente
+   utilitários Tailwind (bg-brand, text-shiny, border-rare, etc).
+   ========================================================================== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg: #090c0b;
+  --color-bg-elevated: #0f1613;
+  --color-panel: #121a17;
+  --color-panel-hover: #17211d;
+  --color-border: #1e2b26;
+  --color-border-strong: #2a3a33;
+  --color-ink: #e9f3ee;
+  --color-ink-dim: #9db3aa;
+  --color-ink-faint: #63776e;
+
+  --color-brand: #2dd4bf;
+  --color-brand-dim: #12433c;
+
+  --color-rare: #fbbf24;
+  --color-rare-dim: #4a380f;
+  --color-capture: #4ade80;
+  --color-capture-dim: #163a22;
+  --color-battle: #fb7185;
+  --color-battle-dim: #46141d;
+  --color-evolution: #a78bfa;
+  --color-evolution-dim: #2c2350;
+  --color-levelup: #38bdf8;
+  --color-levelup-dim: #0e3348;
+  --color-shiny: #facc15;
+  --color-shiny-dim: #4a3c0a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--color-bg);
+  --color-bg-elevated: var(--color-bg-elevated);
+  --color-panel: var(--color-panel);
+  --color-panel-hover: var(--color-panel-hover);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-ink: var(--color-ink);
+  --color-ink-dim: var(--color-ink-dim);
+  --color-ink-faint: var(--color-ink-faint);
+
+  --color-brand: var(--color-brand);
+  --color-brand-dim: var(--color-brand-dim);
+
+  --color-rare: var(--color-rare);
+  --color-rare-dim: var(--color-rare-dim);
+  --color-capture: var(--color-capture);
+  --color-capture-dim: var(--color-capture-dim);
+  --color-battle: var(--color-battle);
+  --color-battle-dim: var(--color-battle-dim);
+  --color-evolution: var(--color-evolution);
+  --color-evolution-dim: var(--color-evolution-dim);
+  --color-levelup: var(--color-levelup);
+  --color-levelup-dim: var(--color-levelup-dim);
+  --color-shiny: var(--color-shiny);
+  --color-shiny-dim: var(--color-shiny-dim);
+
+  --font-sans: var(--font-display);
+  --font-mono: var(--font-data);
+
+  --animate-slide-in: slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-pulse-live: pulse-live 2s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.4s linear infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
+@keyframes pulse-live {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgb(45 212 191 / 0.55);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 6px rgb(45 212 191 / 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html {
+  color-scheme: dark;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(45 212 191 / 0.08), transparent),
+    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    28px 28px,
+    28px 28px;
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--color-brand);
+  color: var(--color-bg);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 999px;
+  border: 2px solid var(--color-bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-faint);
+}
+
+/* Pixel art (sprites, skins) sem borrão de upscale */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+}
+
+.font-data {
+  font-family: var(--font-data), ui-monospace, monospace;
 }
