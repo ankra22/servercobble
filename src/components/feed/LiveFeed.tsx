@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Loader2, RadioTower } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { FEED_SELECT } from "@/lib/queries/feed";
 import type { FeedEvent, FeedEventType, FeedEventWithTrainer, Trainer } from "@/lib/database.types";
@@ -115,10 +115,7 @@ export function LiveFeed({
           {connected ? (
             <LiveDot />
           ) : (
-            <span className="flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-ink-faint">
-              <RadioTower className="h-3 w-3" />
-              conectando…
-            </span>
+            <span className="rounded-full border border-border px-3 py-1 text-xs text-ink-faint">conectando…</span>
           )}
         </span>
       </div>

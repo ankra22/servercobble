@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Medal } from "lucide-react";
 import type { Trainer } from "@/lib/database.types";
 import { TrainerAvatar } from "@/components/TrainerAvatar";
 import { formatDate } from "@/lib/format";
@@ -16,9 +15,8 @@ export function TrainerCard({ trainer }: { trainer: Trainer }) {
         <p className="truncate font-data text-xs text-ink-faint">@{trainer.username}</p>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1">
-        <span className="flex items-center gap-1 rounded-full bg-rare-dim/40 px-2 py-0.5 text-xs font-medium text-rare">
-          <Medal className="h-3 w-3" />
-          {trainer.badges_count}
+        <span className="rounded-full bg-rare-dim/40 px-2 py-0.5 text-xs font-medium text-rare">
+          {trainer.badges_count} badge{trainer.badges_count === 1 ? "" : "s"}
         </span>
         <span className="text-[10px] text-ink-faint">desde {formatDate(trainer.created_at)}</span>
       </div>

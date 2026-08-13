@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CalendarDays, Backpack, Sparkles, Swords, Wand2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getTrainerByUsername, getTrainerCounters, getTrainerPokemons } from "@/lib/queries/trainers";
 import { fetchFeedEvents } from "@/lib/queries/feed";
@@ -59,10 +58,7 @@ export default async function TrainerProfilePage({ params }: PageProps) {
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">{trainer.display_name}</h1>
             <p className="font-data text-sm text-ink-faint">@{trainer.username}</p>
-            <p className="mt-1.5 flex items-center gap-1.5 text-xs text-ink-faint">
-              <CalendarDays className="h-3.5 w-3.5" />
-              treinador desde {formatDate(trainer.created_at)}
-            </p>
+            <p className="mt-1.5 text-xs text-ink-faint">treinador desde {formatDate(trainer.created_at)}</p>
           </div>
         </div>
 
@@ -75,10 +71,10 @@ export default async function TrainerProfilePage({ params }: PageProps) {
       </section>
 
       <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile icon={Backpack} label="Pokémon capturados" value={counters.totalCaptured} tone="capture" />
-        <StatTile icon={Sparkles} label="Shinies" value={counters.shinyCount} tone="shiny" />
-        <StatTile icon={Wand2} label="Evoluções" value={counters.evolutions} tone="evolution" />
-        <StatTile icon={Swords} label="Ginásios vencidos" value={counters.gymDefeats} tone="battle" />
+        <StatTile label="Pokémon capturados" value={counters.totalCaptured} tone="capture" />
+        <StatTile label="Shinies" value={counters.shinyCount} tone="shiny" />
+        <StatTile label="Evoluções" value={counters.evolutions} tone="evolution" />
+        <StatTile label="Ginásios vencidos" value={counters.gymDefeats} tone="battle" />
       </section>
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-5">

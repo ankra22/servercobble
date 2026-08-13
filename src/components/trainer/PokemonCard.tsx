@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { Pokemon } from "@/lib/database.types";
 import { toTitleCase, formatDate } from "@/lib/format";
 import { PokemonSprite } from "@/components/PokemonSprite";
@@ -35,7 +35,6 @@ export function PokemonCard({ pokemon }: { pokemon: Pokemon }) {
       >
         <span className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${pokemon.is_shiny ? "bg-shiny-dim/40" : "bg-bg-elevated"}`}>
           <PokemonSprite species={pokemon.species} isShiny={pokemon.is_shiny} variant="animated" size={40} />
-          {pokemon.is_shiny && <Sparkles className="absolute -right-1 -top-1 h-3.5 w-3.5 text-shiny" />}
         </span>
 
         <div className="min-w-0 flex-1">

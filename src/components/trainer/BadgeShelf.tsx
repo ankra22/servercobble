@@ -1,5 +1,3 @@
-import { Medal } from "lucide-react";
-
 export function BadgeShelf({ count }: { count: number }) {
   const visible = Math.min(count, 8);
   const overflow = count - visible;
@@ -13,11 +11,9 @@ export function BadgeShelf({ count }: { count: number }) {
       {Array.from({ length: visible }).map((_, i) => (
         <span
           key={i}
-          className="flex h-7 w-7 items-center justify-center rounded-lg border border-rare/25 bg-rare-dim/40 text-rare"
+          className="h-7 w-7 rounded-lg border border-rare/25 bg-rare-dim/40"
           title={`Badge ${i + 1}`}
-        >
-          <Medal className="h-3.5 w-3.5" />
-        </span>
+        />
       ))}
       {overflow > 0 && (
         <span className="flex h-7 items-center rounded-lg border border-rare/25 bg-rare-dim/40 px-2 font-data text-xs text-rare">

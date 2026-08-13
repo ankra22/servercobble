@@ -153,3 +153,65 @@ body {
 .font-data {
   font-family: var(--font-data), ui-monospace, monospace;
 }
+
+/* `.fixed-video-bg` (ver FixedVideoBackground.tsx) — vídeo fixo cobrindo a
+   tela inteira, atrás do conteúdo de qualquer página que o use. */
+.fixed-video-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   Landing (/) — sequência de telas cheias com scroll-snap nativo, com o
+   `.fixed-video-bg` atrás das 5 seções. Cada `.landing-section` define
+   `--glow` (um token --color-* do tema) pro halo + grid por cima do vídeo, e
+   um `background-color` translúcido faz de véu pra manter o texto legível
+   sem esconder o vídeo por completo.
+   ========================================================================== */
+.landing-shell {
+  height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+}
+
+.landing-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  background-color: color-mix(in srgb, var(--color-bg) 74%, transparent);
+  background-image:
+    radial-gradient(ellipse 65% 55% at 50% 8%, color-mix(in srgb, var(--glow) 24%, transparent), transparent 70%),
+    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    32px 32px,
+    32px 32px;
+}
+
+.landing-hero-title {
+  text-shadow:
+    0 0 2px rgb(255 255 255 / 0.6),
+    0 0 44px rgb(255 255 255 / 0.28);
+}
+
+@keyframes hint-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+
+.animate-hint-bounce {
+  animation: hint-bounce 1.8s ease-in-out infinite;
+}

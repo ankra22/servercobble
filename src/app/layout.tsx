@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { SiteSectionNav } from "@/components/navigation/SiteSectionNav";
 
 const display = Space_Grotesk({
   variable: "--font-display",
@@ -28,10 +27,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={`${display.variable} ${data.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+      <body className="min-h-full antialiased">
+        <div className="fixed left-6 top-1/2 z-30 hidden -translate-y-1/2 2xl:block">
+          <SiteSectionNav />
+        </div>
+        {children}
       </body>
     </html>
   );

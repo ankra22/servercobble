@@ -30,11 +30,10 @@ export function FeedFilters({ active, onChange }: FeedFiltersProps) {
             key={type}
             type="button"
             onClick={() => onChange(type)}
-            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
               isActive ? `${tone.softBorder} ${tone.softBg} ${tone.text}` : "border-border text-ink-dim hover:border-border-strong hover:text-ink"
             }`}
           >
-            <config.icon className="h-3.5 w-3.5" />
             {config.label}
           </button>
         );

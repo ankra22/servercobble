@@ -10,7 +10,7 @@ export default function NotFound() {
         Esse treinador ou essa página não foi encontrada — pode ter mudado de username ou nunca ter existido.
       </p>
       <Link
-        href="/"
+        href="/feed"
         className="mt-6 rounded-full border border-brand/25 bg-brand-dim/40 px-4 py-2 text-sm font-medium text-brand transition-colors hover:bg-brand-dim/60"
       >
         Voltar pro feed
