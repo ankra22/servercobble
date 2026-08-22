@@ -31,6 +31,12 @@
   --color-levelup-dim: #0e3348;
   --color-shiny: #facc15;
   --color-shiny-dim: #4a3c0a;
+
+  /* Destaque de "Pokémon que você está de olho" (preferência salva) — eixo
+     separado dos tons de evento acima, por isso um vermelho mais puro/vivo
+     do que o --color-battle (rosado, específico de ginásio). */
+  --color-watch: #ef4444;
+  --color-watch-dim: #450a0a;
 }
 
 @theme inline {
@@ -60,11 +66,15 @@
   --color-shiny: var(--color-shiny);
   --color-shiny-dim: var(--color-shiny-dim);
 
+  --color-watch: var(--color-watch);
+  --color-watch-dim: var(--color-watch-dim);
+
   --font-sans: var(--font-display);
   --font-mono: var(--font-data);
 
   --animate-slide-in: slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-pulse-live: pulse-live 2s ease-in-out infinite;
+  --animate-pulse-watch: pulse-watch 1.8s ease-in-out infinite;
   --animate-shimmer: shimmer 2.4s linear infinite;
 }
 
@@ -88,6 +98,16 @@
   50% {
     opacity: 0.7;
     box-shadow: 0 0 0 6px rgb(45 212 191 / 0);
+  }
+}
+
+@keyframes pulse-watch {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(239 68 68 / 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgb(239 68 68 / 0);
   }
 }
 

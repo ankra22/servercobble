@@ -7,18 +7,28 @@ estatísticas).
 
 **Stack:** Next.js (App Router) · Supabase (Postgres + Realtime) · Tailwind CSS v4 · deploy na Vercel.
 
-O preenchimento do banco é feito por um script Python externo (fora deste
-repositório), que lê os logs do servidor Minecraft e insere os dados no
-Supabase usando a `service_role key`. Este site é **somente leitura**: usa a
-`anon key` e consome os dados via client Supabase + `postgres_changes`
+O preenchimento do banco é feito pelo coletor em [`collector/`](./collector) —
+um mod Fabric/Kotlin que roda dentro do servidor Minecraft (escuta os
+eventos do Cobblemon) mais um script Python que lê o que o mod escreve e
+insere no Supabase usando a `service_role key`. Os dados do jogo
+(`trainers`, `pokemons`, `feed_events`) são **somente leitura** pelo site —
+ele usa a `anon key` e consome via client Supabase + `postgres_changes`
 (Realtime).
+
+Login é opcional (via [Clerk](https://clerk.com)) e serve só pra salvar
+preferências do usuário (`user_preferences`, ex.: espécie que ele está de
+olho) — essa tabela é a única em que o site escreve, sempre a partir de uma
+Server Action que confere a sessão do Clerk no servidor e usa a
+`service_role key` (nunca a `anon key`, nunca direto do navegador). Ver
+`src/lib/preferences.ts` e `src/lib/supabase/admin.ts`.
 
 ## Estrutura do banco
 
 O schema completo está em [`supabase/schema.sql`](./supabase/schema.sql) —
-tabelas `trainers`, `pokemons` e `feed_events`, com índices, Row Level
-Security (leitura pública, sem escrita pela anon key) e a publicação
-Realtime habilitada em `feed_events`.
+tabelas `trainers`, `pokemons`, `feed_events` (leitura pública, sem escrita
+pela anon key) e `user_preferences` (sem policy pública nenhuma — só a
+service_role acessa), com índices e a publicação Realtime habilitada em
+`feed_events`.
 
 ## Rodando localmente
 
@@ -31,8 +41,9 @@ Realtime habilitada em `feed_events`.
 2. Crie um projeto no [Supabase](https://supabase.com) e rode o script
    `supabase/schema.sql` no SQL Editor do projeto.
 
-3. Copie o arquivo de exemplo de variáveis de ambiente e preencha com a URL
-   e a `anon key` do seu projeto (Project Settings → API):
+3. Copie o arquivo de exemplo de variáveis de ambiente e preencha (Supabase:
+   Project Settings → API; Clerk: dashboard.clerk.com → API Keys, ou
+   `vercel integration add clerk`):
 
    ```bash
    cp .env.local.example .env.local
@@ -57,21 +68,28 @@ src/
     trainers/page.tsx           # Diretório de treinadores (com busca)
     trainers/[username]/page.tsx  # Perfil: time, PC, badges, stats, atividade
   components/
-    feed/                       # LiveFeed (realtime), cards, filtros, skeleton
+    feed/                       # LiveFeed (realtime), cards, filtros, busca por espécie
     trainer/                    # Cards de treinador/Pokémon, tabs time/PC, badges
-    layout/                     # Header, Footer
+    layout/                     # Header (com login Clerk), Footer
   lib/
-    supabase/                   # Clients (browser + server, via @supabase/ssr)
+    supabase/                   # Clients: browser + server (anon, leitura) e admin (service_role, só Server Actions)
     queries/                    # Funções de leitura (feed, treinadores, stats)
+    preferences.ts              # Server Actions de preferências do usuário logado (Clerk)
     database.types.ts           # Tipos gerados à mão a partir do schema.sql
+  proxy.ts                      # Ativa a sessão do Clerk (não bloqueia rotas — site continua público)
+collector/                      # Coletor (mod Kotlin + ingestor Python) — ver collector/README.md
 ```
 
 ## Deploy na Vercel
 
 1. Suba o repositório pro GitHub e importe na Vercel (ou use `vercel deploy`).
-2. Configure as env vars do projeto na Vercel (`NEXT_PUBLIC_SUPABASE_URL` e
-   `NEXT_PUBLIC_SUPABASE_ANON_KEY`) — as mesmas do `.env.local`.
-3. Deploy. Não há build steps extras: é um Next.js padrão.
+2. Configure as env vars do projeto na Vercel — todas as do `.env.local.example`
+   (Supabase + Clerk). Já estão registradas em Development/Production neste
+   projeto (`vercel env ls` pra conferir); `vercel integration add clerk`
+   provisiona as duas do Clerk automaticamente num projeto novo.
+3. Deploy. Não há build steps extras: é um Next.js padrão. Analytics
+   (`@vercel/analytics`) já vem plugado no layout — visitas aparecem no
+   dashboard da Vercel assim que o deploy estiver no ar.
 
 ## Identidade visual
 

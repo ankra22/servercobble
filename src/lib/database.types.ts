@@ -8,6 +8,8 @@
 
 export type PokemonLocation = "team" | "pc";
 
+export type SpawnRarity = "rare" | "ultra-rare";
+
 export type FeedEventType =
   | "rare_spawn"
   | "capture"
@@ -72,6 +74,7 @@ export interface Database {
           ivs: PokemonIVs;
           caught_at: string;
           caught_location: string | null;
+          game_uuid: string | null;
         };
         Insert: {
           id?: string;
@@ -87,6 +90,7 @@ export interface Database {
           ivs?: PokemonIVs;
           caught_at?: string;
           caught_location?: string | null;
+          game_uuid?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["pokemons"]["Insert"]>;
         Relationships: [
@@ -110,6 +114,8 @@ export interface Database {
           gym_leader_name: string | null;
           message: string | null;
           created_at: string;
+          source_event_id: string | null;
+          rarity: SpawnRarity | null;
         };
         Insert: {
           id?: string;
@@ -121,6 +127,8 @@ export interface Database {
           gym_leader_name?: string | null;
           message?: string | null;
           created_at?: string;
+          source_event_id?: string | null;
+          rarity?: SpawnRarity | null;
         };
         Update: Partial<Database["public"]["Tables"]["feed_events"]["Insert"]>;
         Relationships: [
@@ -132,6 +140,36 @@ export interface Database {
             referencedColumns: ["id"];
           },
         ];
+      };
+      user_preferences: {
+        Row: {
+          id: string;
+          clerk_user_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          clerk_user_id: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["user_preferences"]["Insert"]>;
+        Relationships: [];
+      };
+      watched_species: {
+        Row: {
+          id: string;
+          clerk_user_id: string;
+          species: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          clerk_user_id: string;
+          species: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["watched_species"]["Insert"]>;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

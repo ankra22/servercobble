@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { fetchFeedEvents } from "@/lib/queries/feed";
 import { getServerStats } from "@/lib/queries/stats";
 import { isSupabaseConfigured } from "@/lib/env";
+import { getWatchedSpeciesList } from "@/lib/preferences";
 import { LiveFeed } from "@/components/feed/LiveFeed";
 import { StatTile } from "@/components/StatTile";
 import { SetupNotice } from "@/components/SetupNotice";
@@ -18,7 +19,11 @@ export default async function HomePage() {
   }
 
   const supabase = await createClient();
-  const [events, stats] = await Promise.all([fetchFeedEvents(supabase, { limit: 30 }), getServerStats(supabase)]);
+  const [events, stats, watchedSpecies] = await Promise.all([
+    fetchFeedEvents(supabase, { limit: 30, excludeRareSpawnRarity: "rare" }),
+    getServerStats(supabase),
+    getWatchedSpeciesList(),
+  ]);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -36,7 +41,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <LiveFeed initialEvents={events} />
+      <LiveFeed initialEvents={events} initialWatchedSpecies={watchedSpecies} />
     </div>
   );
 }

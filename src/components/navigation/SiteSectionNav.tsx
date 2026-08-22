@@ -7,13 +7,15 @@ const SECTIONS = [
   { label: "Início", href: "/" },
   { label: "Regras", href: "/regras" },
   { label: "Feed", href: "/feed" },
+  { label: "Spawns raros", href: "/spawns-raros" },
   { label: "Treinadores", href: "/trainers" },
 ] as const;
 
 function activeIndexFor(pathname: string): number | null {
   if (pathname.startsWith("/regras")) return 1;
   if (pathname.startsWith("/feed")) return 2;
-  if (pathname.startsWith("/trainers")) return 3;
+  if (pathname.startsWith("/spawns-raros")) return 3;
+  if (pathname.startsWith("/trainers")) return 4;
   if (pathname === "/") return 0;
   return null;
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { SiteSectionNav } from "@/components/navigation/SiteSectionNav";
 
@@ -28,10 +30,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={`${display.variable} ${data.variable} h-full`}>
       <body className="min-h-full antialiased">
-        <div className="fixed left-6 top-1/2 z-30 hidden -translate-y-1/2 2xl:block">
-          <SiteSectionNav />
-        </div>
-        {children}
+        <ClerkProvider afterSignOutUrl="/feed">
+          <div className="fixed left-6 top-1/2 z-30 hidden -translate-y-1/2 2xl:block">
+            <SiteSectionNav />
+          </div>
+          {children}
+        </ClerkProvider>
+        <Analytics />
       </body>
     </html>
   );

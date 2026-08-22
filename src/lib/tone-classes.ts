@@ -1,4 +1,4 @@
-export type Tone = "brand" | "rare" | "capture" | "battle" | "evolution" | "levelup" | "shiny";
+export type Tone = "brand" | "rare" | "capture" | "battle" | "evolution" | "levelup" | "shiny" | "watch";
 
 /**
  * Classes Tailwind escritas por extenso para cada tom, indexadas por chave.
@@ -54,5 +54,12 @@ export const TONE_CLASSES: Record<Tone, { text: string; softBg: string; softBord
     softBorder: "border-shiny/25",
     dot: "bg-shiny",
     ring: "ring-shiny/30",
+  },
+  watch: {
+    text: "text-watch",
+    softBg: "bg-watch-dim/40",
+    softBorder: "border-watch/25",
+    dot: "bg-watch",
+    ring: "ring-watch/30",
   },
 };

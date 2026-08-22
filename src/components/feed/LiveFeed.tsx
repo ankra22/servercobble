@@ -4,9 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { FEED_SELECT } from "@/lib/queries/feed";
-import type { FeedEvent, FeedEventType, FeedEventWithTrainer, Trainer } from "@/lib/database.types";
+import type { FeedEvent, FeedEventType, FeedEventWithTrainer, SpawnRarity, Trainer } from "@/lib/database.types";
 import { FeedEventCard } from "@/components/feed/FeedEventCard";
 import { FeedFilters } from "@/components/feed/FeedFilters";
+import { SpeciesFilter } from "@/components/feed/SpeciesFilter";
 import { LiveDot } from "@/components/LiveDot";
 
 const PAGE_SIZE = 30;
@@ -15,23 +16,51 @@ interface LiveFeedProps {
   initialEvents: FeedEventWithTrainer[];
   /** Quando definido, o feed mostra só os eventos deste treinador (perfil). */
   trainerId?: string;
-  /** Esconde os filtros por tipo — usado na versão compacta do perfil. */
+  /** Esconde os botões de filtro por tipo — usado na versão compacta do perfil e em abas de um tipo só. */
   showFilters?: boolean;
+  /** Esconde a busca por espécie — independente de `showFilters` (ex.: some no perfil, mas fica na aba de raros). */
+  showSpeciesFilter?: boolean;
   emptyMessage?: string;
+  /** Só mostra eventos desses tipos (ex.: ["rare_spawn"] na aba de spawns raros). */
+  onlyTypes?: FeedEventType[];
+  /** Esconde `rare_spawn` dessa raridade (ex.: "rare" no feed principal). */
+  excludeRareSpawnRarity?: SpawnRarity;
+  /** Lista de espécies salvas do usuário logado (Clerk) — cada uma destaca o card em vermelho. */
+  initialWatchedSpecies?: string[];
 }
 
 export function LiveFeed({
   initialEvents,
   trainerId,
   showFilters = true,
+  showSpeciesFilter = showFilters,
   emptyMessage = "Nenhum evento por aqui ainda. Assim que algo acontecer no servidor, aparece automaticamente.",
+  onlyTypes,
+  excludeRareSpawnRarity,
+  initialWatchedSpecies = [],
 }: LiveFeedProps) {
   const [events, setEvents] = useState(initialEvents);
   const [filter, setFilter] = useState<FeedEventType | "all">("all");
+  const [speciesQuery, setSpeciesQuery] = useState("");
+  // Separada da busca (`speciesQuery`, temporária) — é a lista de espécies
+  // salva de verdade, usada só pra destacar o card em vermelho quando uma
+  // delas aparecer no feed, mesmo que o usuário esteja buscando outra coisa.
+  const [watchedSpecies, setWatchedSpecies] = useState(initialWatchedSpecies);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(initialEvents.length >= PAGE_SIZE);
   const [newIds, setNewIds] = useState<Set<string>>(new Set());
   const [connected, setConnected] = useState(false);
+
+  const belongsToThisFeed = useCallback(
+    (event: FeedEvent) => {
+      if (onlyTypes && !onlyTypes.includes(event.type)) return false;
+      if (excludeRareSpawnRarity && event.type === "rare_spawn" && event.rarity === excludeRareSpawnRarity) {
+        return false;
+      }
+      return true;
+    },
+    [onlyTypes, excludeRareSpawnRarity],
+  );
 
   const supabase = useMemo(() => createClient(), []);
   const trainerCache = useRef<Map<string, Pick<Trainer, "id" | "username" | "display_name" | "skin_url">>>(
@@ -59,6 +88,7 @@ export function LiveFeed({
           const row = payload.new;
           if (knownIds.current.has(row.id)) return;
           knownIds.current.add(row.id);
+          if (!belongsToThisFeed(row)) return;
 
           let trainer = row.trainer_id ? trainerCache.current.get(row.trainer_id) ?? null : null;
           if (row.trainer_id && !trainer) {
@@ -95,6 +125,10 @@ export function LiveFeed({
       .range(events.length, events.length + PAGE_SIZE - 1);
 
     if (trainerId) query = query.eq("trainer_id", trainerId);
+    if (onlyTypes && onlyTypes.length > 0) query = query.in("type", onlyTypes);
+    if (excludeRareSpawnRarity) {
+      query = query.or(`type.neq.rare_spawn,rarity.neq.${excludeRareSpawnRarity}`);
+    }
 
     const { data } = await query;
     const page = (data ?? []) as unknown as FeedEventWithTrainer[];
@@ -103,9 +137,13 @@ export function LiveFeed({
     page.forEach((e) => knownIds.current.add(e.id));
     setHasMore(page.length === PAGE_SIZE);
     setLoadingMore(false);
-  }, [supabase, events.length, trainerId]);
+  }, [supabase, events.length, trainerId, onlyTypes, excludeRareSpawnRarity]);
 
-  const visibleEvents = filter === "all" ? events : events.filter((e) => e.type === filter);
+  const typeFiltered = filter === "all" ? events : events.filter((e) => e.type === filter);
+  const normalizedQuery = speciesQuery.trim().toLowerCase();
+  const visibleEvents = normalizedQuery
+    ? typeFiltered.filter((e) => e.species?.toLowerCase().includes(normalizedQuery))
+    : typeFiltered;
 
   return (
     <div className="flex flex-col gap-4">
@@ -120,6 +158,15 @@ export function LiveFeed({
         </span>
       </div>
 
+      {showSpeciesFilter && (
+        <SpeciesFilter
+          value={speciesQuery}
+          onChange={setSpeciesQuery}
+          watchedSpecies={watchedSpecies}
+          onWatchedSpeciesChange={setWatchedSpecies}
+        />
+      )}
+
       {visibleEvents.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-ink-faint">
           {emptyMessage}
@@ -127,7 +174,12 @@ export function LiveFeed({
       ) : (
         <div className="flex flex-col gap-3">
           {visibleEvents.map((event) => (
-            <FeedEventCard key={event.id} event={event} isNew={newIds.has(event.id)} />
+            <FeedEventCard
+              key={event.id}
+              event={event}
+              isNew={newIds.has(event.id)}
+              isWatched={Boolean(event.species) && watchedSpecies.includes(event.species!.toLowerCase())}
+            />
           ))}
         </div>
       )}

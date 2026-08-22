@@ -7,7 +7,14 @@ import { TONE_CLASSES } from "@/lib/tone-classes";
 import { TrainerAvatar } from "@/components/TrainerAvatar";
 import { PokemonSprite } from "@/components/PokemonSprite";
 
-export function FeedEventCard({ event, isNew = false }: { event: FeedEventWithTrainer; isNew?: boolean }) {
+interface FeedEventCardProps {
+  event: FeedEventWithTrainer;
+  isNew?: boolean;
+  /** Espécie deste evento é a que o usuário logado marcou como preferida — destaque forte. */
+  isWatched?: boolean;
+}
+
+export function FeedEventCard({ event, isNew = false, isWatched = false }: FeedEventCardProps) {
   const config = FEED_EVENT_CONFIG[event.type];
   const tone = TONE_CLASSES[config.tone];
   const coords = formatCoordinates(event.coordinates);
@@ -15,7 +22,11 @@ export function FeedEventCard({ event, isNew = false }: { event: FeedEventWithTr
 
   return (
     <article
-      className={`group relative rounded-2xl border ${tone.softBorder} bg-panel/70 p-4 transition-colors hover:bg-panel-hover sm:p-5 ${isNew ? "animate-slide-in" : ""}`}
+      className={`group relative rounded-2xl border p-4 transition-colors sm:p-5 ${isNew ? "animate-slide-in" : ""} ${
+        isWatched
+          ? "animate-pulse-watch border-watch bg-watch-dim/70"
+          : `${tone.softBorder} bg-panel/70 hover:bg-panel-hover`
+      }`}
     >
       {event.is_shiny && (
         <div className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_0_0_1px_rgb(250_204_21/0.25)]" />
@@ -23,12 +34,22 @@ export function FeedEventCard({ event, isNew = false }: { event: FeedEventWithTr
 
       <div>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          {isWatched && (
+            <span className="inline-flex items-center rounded-full bg-watch px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+              Você quer esse!
+            </span>
+          )}
           <span className={`text-[11px] font-semibold uppercase tracking-wider ${tone.text}`}>
             {config.label}
           </span>
           {event.is_shiny && (
             <span className="inline-flex items-center rounded-full bg-shiny-dim/50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-shiny">
               Shiny
+            </span>
+          )}
+          {event.type === "rare_spawn" && event.rarity && (
+            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${tone.softBg} ${tone.text}`}>
+              {event.rarity === "ultra-rare" ? "Ultra-raro" : "Raro"}
             </span>
           )}
           <span className="ml-auto shrink-0 font-data text-xs text-ink-faint">{timeAgo(event.created_at)}</span>
