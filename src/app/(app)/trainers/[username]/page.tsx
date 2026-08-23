@@ -9,6 +9,7 @@ import { isSupabaseConfigured } from "@/lib/env";
 import { formatDate } from "@/lib/format";
 import { TrainerAvatar } from "@/components/TrainerAvatar";
 import { RegionBadgeCase } from "@/components/trainer/RegionBadgeCase";
+import { ChevronMark } from "@/components/icons/Chevron";
 import { TeamPCTabs } from "@/components/trainer/TeamPCTabs";
 import { StatTile } from "@/components/StatTile";
 import { LiveFeed } from "@/components/feed/LiveFeed";
@@ -87,9 +88,15 @@ export default async function TrainerProfilePage({ params }: PageProps) {
         <StatTile label="Ginásios vencidos" value={counters.gymDefeats} tone="battle" />
       </section>
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-dim">Insígnias</h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <details className="group mt-8 rounded-2xl border border-border bg-panel/60">
+        <summary className="flex cursor-pointer list-none items-center justify-between p-4 [&::-webkit-details-marker]:hidden">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-dim">Insígnias</h2>
+          <span className="flex items-center gap-2 text-xs text-ink-faint">
+            {trainer.badges_count} conquistada{trainer.badges_count === 1 ? "" : "s"}
+            <ChevronMark className="h-4 w-4 transition-transform duration-200 group-open:rotate-180" />
+          </span>
+        </summary>
+        <div className="grid grid-cols-1 gap-3 p-4 pt-0 sm:grid-cols-2">
           {REGIONS.map((region) => (
             <RegionBadgeCase
               key={region.id}
@@ -99,7 +106,7 @@ export default async function TrainerProfilePage({ params }: PageProps) {
             />
           ))}
         </div>
-      </section>
+      </details>
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-5">
         <section className="lg:col-span-3">

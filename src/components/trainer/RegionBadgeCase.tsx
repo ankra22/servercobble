@@ -1,6 +1,12 @@
 import type { RegionInfo } from "@/lib/regions";
-import { getGyms, colorForSlot } from "@/lib/gyms";
+import { getGyms, colorForGym } from "@/lib/gyms";
 import { GymBadgeIcon } from "@/components/trainer/GymBadgeIcon";
+
+const RANK_LABEL: Record<string, string> = {
+  gym: "",
+  elite_four: " (Elite Four)",
+  champion: " (Campeão)",
+};
 
 export function RegionBadgeCase({
   region,
@@ -13,7 +19,8 @@ export function RegionBadgeCase({
 }) {
   const gyms = getGyms(region.id);
   const earned = new Set(earnedNames);
-  const earnedCount = gyms.filter((gym) => earned.has(gym.name)).length;
+  const badgeSlots = gyms.filter((gym) => gym.rank === "gym");
+  const earnedCount = badgeSlots.filter((gym) => earned.has(gym.name)).length;
 
   return (
     <div className="rounded-2xl border border-border bg-panel/60 p-4">
@@ -27,21 +34,20 @@ export function RegionBadgeCase({
           )}
         </div>
         <span className="text-xs text-ink-faint">
-          {earnedCount}/{gyms.length}
+          {earnedCount}/{badgeSlots.length} insígnias
         </span>
       </div>
 
       <div className="flex flex-wrap gap-2">
         {gyms.map((gym) => {
           const isEarned = earned.has(gym.name);
+          const suffix = gym.bonus ? " (pós-liga)" : RANK_LABEL[gym.rank];
           return (
-            <div
-              key={gym.id}
-              title={gym.bonus ? `${gym.name} (pós-liga)` : gym.name}
-              className="flex flex-col items-center gap-1"
-            >
+            <div key={gym.id} title={`${gym.name}${suffix}`} className="flex flex-col items-center gap-1">
               <GymBadgeIcon
-                color={colorForSlot(gym.order)}
+                color={colorForGym(gym)}
+                shape={gym.rank === "champion" ? "star" : "badge"}
+                size={gym.rank === "champion" ? 40 : 34}
                 locked={!isEarned}
                 className={isEarned ? "" : "text-ink-faint"}
               />

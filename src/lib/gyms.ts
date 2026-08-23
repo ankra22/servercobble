@@ -5,9 +5,10 @@ export interface GymSlot {
   name: string;
   order: number;
   bonus: boolean;
+  rank: "gym" | "elite_four" | "champion";
 }
 
-export const GYMS: Record<string, GymSlot[]> = gymsData;
+export const GYMS: Record<string, GymSlot[]> = gymsData as Record<string, GymSlot[]>;
 
 export function getGyms(regionId: string): GymSlot[] {
   return GYMS[regionId] ?? [];
@@ -32,6 +33,11 @@ export const GYM_SLOT_COLORS = [
   "#f87171", // bônus 2
 ];
 
-export function colorForSlot(order: number): string {
-  return GYM_SLOT_COLORS[(order - 1) % GYM_SLOT_COLORS.length];
+export const ELITE_FOUR_COLOR = "#818cf8";
+export const CHAMPION_COLOR = "#eab308";
+
+export function colorForGym(slot: GymSlot): string {
+  if (slot.rank === "champion") return CHAMPION_COLOR;
+  if (slot.rank === "elite_four") return ELITE_FOUR_COLOR;
+  return GYM_SLOT_COLORS[(slot.order - 1) % GYM_SLOT_COLORS.length];
 }

@@ -4,49 +4,92 @@
       "id": "kanto_brock",
       "name": "Brock",
       "order": 1,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "kanto_misty",
       "name": "Misty",
       "order": 2,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "kanto_ltsurge",
       "name": "Lt. Surge",
       "order": 3,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "kanto_erika",
       "name": "Erika",
       "order": 4,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "kanto_koga",
       "name": "Koga",
       "order": 5,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "kanto_sabrina",
       "name": "Sabrina",
       "order": 6,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "kanto_blaine",
       "name": "Blaine",
       "order": 7,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "kanto_giovanni",
       "name": "Giovanni",
       "order": 8,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
+    },
+    {
+      "id": "kanto_league_lorelei",
+      "name": "Lorelei",
+      "order": 9,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "kanto_league_bruno",
+      "name": "Bruno",
+      "order": 10,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "kanto_league_agatha",
+      "name": "Agatha",
+      "order": 11,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "kanto_league_lance",
+      "name": "Lance",
+      "order": 12,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "kanto_champion_blue",
+      "name": "Blue",
+      "order": 13,
+      "bonus": false,
+      "rank": "champion"
     }
   ],
   "johto": [
@@ -54,49 +97,92 @@
       "id": "johto_valerio",
       "name": "Valerio",
       "order": 1,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "johto_raffaello",
       "name": "Raffaello",
       "order": 2,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "johto_chiara",
       "name": "Chiara",
       "order": 3,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "johto_angelo",
       "name": "Angelo",
       "order": 4,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "johto_furio",
       "name": "Furio",
       "order": 5,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "johto_jasmine",
       "name": "Jasmine",
       "order": 6,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "johto_alfredo",
       "name": "Alfredo",
       "order": 7,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "johto_sandra",
       "name": "Sandra",
       "order": 8,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
+    },
+    {
+      "id": "johto_league_pino",
+      "name": "Pino",
+      "order": 9,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "johto_league_koga",
+      "name": "Koga",
+      "order": 10,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "johto_league_bruno",
+      "name": "Bruno",
+      "order": 11,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "johto_league_karen",
+      "name": "Karen",
+      "order": 12,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "johto_champion_lance",
+      "name": "Lance",
+      "order": 13,
+      "bonus": false,
+      "rank": "champion"
     }
   ],
   "hoenn": [
@@ -104,61 +190,106 @@
       "id": "hoenn_petra",
       "name": "Petra",
       "order": 1,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "hoenn_rudi",
       "name": "Rudi",
       "order": 2,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "hoenn_walter",
       "name": "Walter",
       "order": 3,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "hoenn_fiammetta",
       "name": "Fiammetta",
       "order": 4,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "hoenn_norman",
       "name": "Norman",
       "order": 5,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "hoenn_alice",
       "name": "Alice",
       "order": 6,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "hoenn_tell",
       "name": "Tell",
       "order": 7,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "hoenn_adriano",
       "name": "Adriano",
       "order": 8,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
-      "id": "hoenn_lyris",
-      "name": "Lyris",
+      "id": "hoenn_league_fosco",
+      "name": "Fosco",
       "order": 9,
-      "bonus": true
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "hoenn_league_ester",
+      "name": "Ester",
+      "order": 10,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "hoenn_league_frida",
+      "name": "Frida",
+      "order": 11,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "hoenn_league_drake",
+      "name": "Drake",
+      "order": 12,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "hoenn_champion_rocco",
+      "name": "Rocco",
+      "order": 13,
+      "bonus": false,
+      "rank": "champion"
     },
     {
       "id": "hoenn_pat",
       "name": "Pat",
-      "order": 10,
-      "bonus": true
+      "order": 14,
+      "bonus": false,
+      "rank": "gym"
+    },
+    {
+      "id": "hoenn_lyris",
+      "name": "Lyris",
+      "order": 15,
+      "bonus": true,
+      "rank": "gym"
     }
   ],
   "sinnoh": [
@@ -166,61 +297,106 @@
       "id": "sinnoh_pedro",
       "name": "Pedro",
       "order": 1,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "sinnoh_gardenia",
       "name": "Gardenia",
       "order": 2,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "sinnoh_marzia",
       "name": "Marzia",
       "order": 3,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "sinnoh_omar",
       "name": "Omar",
       "order": 4,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "sinnoh_fannie",
       "name": "Fannie",
       "order": 5,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "sinnoh_ferruccio",
       "name": "Ferruccio",
       "order": 6,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "sinnoh_bianca",
       "name": "Bianca",
       "order": 7,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
     },
     {
       "id": "sinnoh_corrado",
       "name": "Corrado",
       "order": 8,
-      "bonus": false
+      "bonus": false,
+      "rank": "gym"
+    },
+    {
+      "id": "sinnoh_league_aaron",
+      "name": "Aaron",
+      "order": 9,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "sinnoh_league_terrie",
+      "name": "Terrie",
+      "order": 10,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "sinnoh_league_vulcano",
+      "name": "Vulcano",
+      "order": 11,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "sinnoh_league_luciano",
+      "name": "Luciano",
+      "order": 12,
+      "bonus": false,
+      "rank": "elite_four"
+    },
+    {
+      "id": "sinnoh_champion_camilla",
+      "name": "Camilla",
+      "order": 13,
+      "bonus": false,
+      "rank": "champion"
     },
     {
       "id": "sinnoh_buck",
       "name": "Buck",
-      "order": 9,
-      "bonus": true
+      "order": 14,
+      "bonus": true,
+      "rank": "gym"
     },
     {
       "id": "sinnoh_elfio",
       "name": "Elfio",
-      "order": 10,
-      "bonus": true
+      "order": 15,
+      "bonus": true,
+      "rank": "gym"
     }
   ]
 }

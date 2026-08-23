@@ -11,14 +11,18 @@ import org.slf4j.LoggerFactory
 
 /**
  * Escuta o fim de batalhas do rctmod (Radical Cobblemon Trainers) pra
- * detectar quando um jogador derrota um treinador de ginásio de verdade —
- * não campeão, não Elite Four, não rival/grupo — e emitir `gym_defeat`.
+ * detectar quando um jogador derrota um líder de ginásio, um membro da
+ * Elite Four ou o campeão de uma região — e emitir `gym_defeat` com o
+ * `rank` certo. Rival/grupos/outros treinadores não batem em nenhum dos
+ * três casos e são ignorados.
  *
- * Um treinador conta como "líder de ginásio" quando o id do `TrainerType`
- * dele bate com uma das séries que ele pertence (ex.: type "kanto" e
- * série "kanto"). Campeão (`kanto_champion`) e Elite Four (`kanto_league`)
- * têm id de tipo com sufixo, então não batem nessa checagem — fica tudo
- * orientado pelos dados do datapack, sem nome de região fixo no código.
+ * O `rank` vem do PADRÃO DO ID do treinador (`trainerId`), não do campo
+ * `TrainerType` — o datapack tem uma inconsistência real: a Elite Four de
+ * Hoenn e Sinnoh está com o `type` igual ao dos líderes de ginásio comuns
+ * (bug do próprio pack, confirmado inspecionando os arquivos), então
+ * `type` não é confiável pra essa checagem. O id, por outro lado, segue o
+ * padrão `<série>_league_*` / `<série>_champion_*` em todas as 4 regiões
+ * — é a mesma convenção usada em scripts/build-gyms.mjs (site).
  * rctapi/rctmod são opcionais ("suggests" no fabric.mod.json): se não
  * estiverem instalados, só loga um aviso e não faz nada.
  */
@@ -77,11 +81,16 @@ object RctModGymListener {
         val trainerId = defeatedTrainerMob.trainerId ?: return
         val data = RCTMod.getInstance().trainerManager.getData(trainerId) ?: return
         val typeId = data.type.id()
-        val isGymLeader = data.series.anyMatch { it == typeId }
-        if (!isGymLeader) return
+        val seriesId = data.series.findFirst().orElse(null) ?: return
+        val rank = when {
+            trainerId.startsWith("${seriesId}_champion_") -> "champion"
+            trainerId.startsWith("${seriesId}_league_") -> "elite_four"
+            typeId == seriesId -> "gym"
+            else -> return
+        }
 
-        val gymLeaderName = defeatedTrainerMob.name.string
-        TrackerEventWriter.submit(EventFactory.gymDefeat(winningPlayer, gymLeaderName, typeId))
-        logger.info("${winningPlayer.gameProfile.name} derrotou o líder $gymLeaderName ($typeId).")
+        val defeatedName = defeatedTrainerMob.name.string
+        TrackerEventWriter.submit(EventFactory.gymDefeat(winningPlayer, defeatedName, seriesId, rank))
+        logger.info("${winningPlayer.gameProfile.name} derrotou $defeatedName ($seriesId, $rank).")
     }
 }

@@ -130,12 +130,13 @@ object EventFactory {
      * O ingestor marca esses `game_uuid`s como "team" e todo o resto do
      * treinador como "pc".
      */
-    /** Jogador derrotou um treinador de ginásio de verdade do rctmod (não campeão/Elite Four/rival). */
-    fun gymDefeat(player: ServerPlayer, gymLeaderName: String, series: String): JsonObject {
+    /** Jogador derrotou um líder de ginásio, Elite Four ou campeão do rctmod. `rank`: "gym" | "elite_four" | "champion". */
+    fun gymDefeat(player: ServerPlayer, gymLeaderName: String, series: String, rank: String): JsonObject {
         val json = base("gym_defeat")
         json.add("trainer", trainerJson(player))
         json.addProperty("gym_leader_name", gymLeaderName)
         json.addProperty("series", series)
+        json.addProperty("rank", rank)
         return json
     }
 
