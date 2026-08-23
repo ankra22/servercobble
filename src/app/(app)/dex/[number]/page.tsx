@@ -26,7 +26,6 @@ export default async function DexEntryPage({ params }: PageProps) {
 
   const rarityLabel = entry.rarity ? RARITY_LABELS[entry.rarity] : null;
   const foundInWild = entry.biomes.length > 0;
-  const foundInMonument = entry.monuments.length > 0;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
@@ -80,7 +79,7 @@ export default async function DexEntryPage({ params }: PageProps) {
             <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-faint">
               Onde encontrar
             </p>
-            {foundInWild || foundInMonument ? (
+            {foundInWild || entry.hasMonument ? (
               <div className="flex flex-wrap gap-1.5">
                 {entry.biomes.map((biome) => (
                   <span
@@ -90,12 +89,12 @@ export default async function DexEntryPage({ params }: PageProps) {
                     {biome}
                   </span>
                 ))}
-                {foundInMonument && (
+                {entry.hasMonument && (
                   <span
-                    title="Só descobrindo no mundo — nenhuma dica aqui de propósito."
-                    className="rounded-full border border-watch/25 bg-watch-dim/30 px-2.5 py-1 text-xs font-medium text-watch"
+                    title="Explore o mundo pra descobrir."
+                    className="rounded-full border border-watch/25 bg-watch-dim/30 px-2.5 py-1 text-xs font-semibold text-watch"
                   >
-                    Monumento lendário — ?
+                    ?
                   </span>
                 )}
               </div>

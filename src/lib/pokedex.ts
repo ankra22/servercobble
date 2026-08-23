@@ -10,7 +10,8 @@ export interface PokedexEntry {
   labels: string[];
   rarity: SpawnRarity | "common" | "uncommon" | null;
   biomes: string[];
-  monuments: string[];
+  /** Existe monumento lendário — o local exato não é exposto de propósito. */
+  hasMonument: boolean;
 }
 
 export const POKEDEX: PokedexEntry[] = pokedexData as PokedexEntry[];
