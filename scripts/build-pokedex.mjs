@@ -37,120 +37,30 @@ const spawnPoolRoot = path.join(spawnPoolDirArg, "data/cobblemon/spawn_pool_worl
 
 const lang = JSON.parse(fs.readFileSync(langPath, "utf8"));
 
-// Tradução dos tags de bioma mais comuns do spawn pool — o que não estiver
-// aqui cai num fallback automático (remove prefixo, capitaliza).
-const BIOME_LABELS = {
-  is_overworld: "Superfície",
-  is_freezing: "Regiões geladas",
-  is_ocean: "Oceano",
-  is_jungle: "Selva",
-  is_swamp: "Pântano",
-  is_forest: "Floresta",
-  is_lush: "Caverna luxuriante",
-  is_freshwater: "Água doce",
-  is_arid: "Árido",
-  is_spooky: "Sombrio",
-  is_coast: "Litoral",
-  is_hills: "Colinas",
-  is_mountain: "Montanha",
-  is_frozen_ocean: "Oceano congelado",
-  is_tropical_island: "Ilha tropical",
-  is_deep_dark: "Profundezas sombrias",
-  is_taiga: "Taiga",
-  is_badlands: "Terras áridas",
-  is_magical: "Área mágica",
-  is_temperate: "Clima temperado",
-  is_savanna: "Savana",
-  is_floral: "Área florida",
-  is_desert: "Deserto",
-  is_cold_ocean: "Oceano frio",
-  is_plains: "Planície",
-  is_beach: "Praia",
-  is_tundra: "Tundra",
-  is_warm_ocean: "Oceano quente",
-  is_mushroom: "Campo de cogumelos",
-  is_grassland: "Campina",
-  is_volcanic: "Vulcânico",
-  is_sky: "Céu",
-  is_snowy_forest: "Floresta nevada",
-  is_end: "The End",
-  is_dripstone: "Caverna de estalactites",
-  is_bamboo: "Bambuzal",
-  is_river: "Rio",
-  is_island: "Ilha",
-  is_thermal: "Termal",
-  is_deep_ocean: "Oceano profundo",
-  is_lukewarm_ocean: "Oceano morno",
-  is_sandy: "Arenoso",
-  is_glacial: "Glacial",
-  is_snowy: "Nevado",
-  is_peak: "Picos nevados",
-  is_cherry_blossom: "Flor de cerejeira",
-  is_cold: "Frio",
-  is_snowy_taiga: "Taiga nevada",
-  is_cave: "Caverna",
-  is_highlands: "Terras altas",
-  saccharine_trees: "Árvores sacarinas",
-  flowers: "Flores",
-  ruin: "Ruínas",
-  shipwreck_cove: "Baía de naufrágios",
-  white_flowers: "Flores brancas",
-  red_flowers: "Flores vermelhas",
-  blue_flowers: "Flores azuis",
-  yellow_flowers: "Flores amarelas",
-  pink_flowers: "Flores rosas",
-  orange_flowers: "Flores laranjas",
-};
-
+// Nome do bioma em inglês mesmo (sem tradução) — só limpa o prefixo do tag
+// e formata (ex.: "#cobblemon:is_tropical_island" -> "Tropical Island").
+// Alguns tags do Cobblemon têm um segmento extra separado por "/" (ex.:
+// "#cobblemon:nether/is_basalt" -> "Nether – Basalt").
 function biomeLabel(tag) {
   const key = tag.replace(/^#?[a-z_]+:/, "");
-  if (BIOME_LABELS[key]) return BIOME_LABELS[key];
   return key
-    .replace(/^is_/, "")
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .split("/")
+    .map((segment) =>
+      segment
+        .replace(/^is_/, "")
+        .replaceAll("_", " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase()),
+    )
+    .join(" – ");
 }
 
 // Locais "custom_spawn/*" do datapack do Cobbleverse não são biomas de
-// verdade — são os monumentos lendários (torres, templos, etc.). Nomes
-// conhecidos traduzidos à mão; o resto cai num fallback automático.
-const MONUMENT_LABELS = {
-  articuno_tower: "Torre do Articuno",
-  zapdos_tower: "Torre do Zapdos",
-  moltres_tower: "Torre do Moltres",
-  bell_tower: "Torre do Sino",
-  ilex_shrine: "Santuário de Ilex",
-  whirl_island: "Ilha do Redemoinho",
-  newmoon_island: "Ilha da Lua Nova",
-  sky_pillar: "Pilar do Céu",
-  groudon_vulcano: "Vulcão do Groudon",
-  kyogre_temple: "Templo do Kyogre",
-  regirock_temple: "Templo do Regirock",
-  regice_temple: "Templo do Regice",
-  registeel_temple: "Templo do Registeel",
-  deoxys_meteorite: "Meteorito do Deoxys",
-  sinnoh_temple: "Templo de Sinnoh",
-  origin_temple: "Templo da Origem",
-  jirachi_structure: "Estrutura do Jirachi",
-  eternatus_cocoon: "Casulo do Eternatus",
-  crown_spire: "Torre da Coroa",
-  crown_cemetery: "Cemitério da Coroa",
-  split_decision_temple: "Templo da Decisão",
-  secret_garden: "Jardim Secreto",
-  secrt_garden: "Jardim Secreto",
-  flower_paradise: "Paraíso das Flores",
-  team_rocket_radio: "Rádio da Equipe Rocket",
-};
-
-function monumentLabel(tag) {
-  const slug = tag.replace(/^#?[a-z_]+:custom_spawn\//, "");
-  if (MONUMENT_LABELS[slug]) return MONUMENT_LABELS[slug];
-  return slug.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
+// verdade — são os monumentos lendários (torres, templos, etc.). De
+// propósito NÃO extraímos o nome do monumento pra lugar nenhum (nem no
+// JSON) — só se sabe que existe um, o jogador descobre qual explorando.
 const RARITY_RANK = { common: 0, uncommon: 1, rare: 2, "ultra-rare": 3 };
 
-// 1. Spawn pool -> Map<species_id, { rarity, biomeSet, monumentSet }>
+// 1. Spawn pool -> Map<species_id, { rarity, biomeSet, hasMonument }>
 const spawnInfo = new Map();
 for (const file of fs.readdirSync(spawnPoolRoot)) {
   if (!file.endsWith(".json")) continue;
@@ -165,7 +75,9 @@ for (const file of fs.readdirSync(spawnPoolRoot)) {
       entry.rarity = spawn.bucket;
     }
     for (const biome of spawn.condition?.biomes ?? []) {
-      if (/custom_spawn\//.test(biome)) {
+      // "custom_spawn" (com ou sem "/nome-do-local" depois) é sempre um
+      // monumento/local especial do Cobbleverse, nunca um bioma de verdade.
+      if (/custom_spawn/.test(biome)) {
         entry.monumentSet.add(biome);
       } else {
         entry.biomeSet.add(biome);
@@ -210,12 +122,7 @@ function walk(dir) {
             .filter((b, i, arr) => arr.indexOf(b) === i)
             .sort()
         : [],
-      monuments: spawn
-        ? [...spawn.monumentSet]
-            .map(monumentLabel)
-            .filter((m, i, arr) => arr.indexOf(m) === i)
-            .sort()
-        : [],
+      hasMonument: Boolean(spawn?.monumentSet.size),
     });
   }
 }
