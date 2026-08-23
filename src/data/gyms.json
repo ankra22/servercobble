@@ -1,0 +1,226 @@
+{
+  "kanto": [
+    {
+      "id": "kanto_brock",
+      "name": "Brock",
+      "order": 1,
+      "bonus": false
+    },
+    {
+      "id": "kanto_misty",
+      "name": "Misty",
+      "order": 2,
+      "bonus": false
+    },
+    {
+      "id": "kanto_ltsurge",
+      "name": "Lt. Surge",
+      "order": 3,
+      "bonus": false
+    },
+    {
+      "id": "kanto_erika",
+      "name": "Erika",
+      "order": 4,
+      "bonus": false
+    },
+    {
+      "id": "kanto_koga",
+      "name": "Koga",
+      "order": 5,
+      "bonus": false
+    },
+    {
+      "id": "kanto_sabrina",
+      "name": "Sabrina",
+      "order": 6,
+      "bonus": false
+    },
+    {
+      "id": "kanto_blaine",
+      "name": "Blaine",
+      "order": 7,
+      "bonus": false
+    },
+    {
+      "id": "kanto_giovanni",
+      "name": "Giovanni",
+      "order": 8,
+      "bonus": false
+    }
+  ],
+  "johto": [
+    {
+      "id": "johto_valerio",
+      "name": "Valerio",
+      "order": 1,
+      "bonus": false
+    },
+    {
+      "id": "johto_raffaello",
+      "name": "Raffaello",
+      "order": 2,
+      "bonus": false
+    },
+    {
+      "id": "johto_chiara",
+      "name": "Chiara",
+      "order": 3,
+      "bonus": false
+    },
+    {
+      "id": "johto_angelo",
+      "name": "Angelo",
+      "order": 4,
+      "bonus": false
+    },
+    {
+      "id": "johto_furio",
+      "name": "Furio",
+      "order": 5,
+      "bonus": false
+    },
+    {
+      "id": "johto_jasmine",
+      "name": "Jasmine",
+      "order": 6,
+      "bonus": false
+    },
+    {
+      "id": "johto_alfredo",
+      "name": "Alfredo",
+      "order": 7,
+      "bonus": false
+    },
+    {
+      "id": "johto_sandra",
+      "name": "Sandra",
+      "order": 8,
+      "bonus": false
+    }
+  ],
+  "hoenn": [
+    {
+      "id": "hoenn_petra",
+      "name": "Petra",
+      "order": 1,
+      "bonus": false
+    },
+    {
+      "id": "hoenn_rudi",
+      "name": "Rudi",
+      "order": 2,
+      "bonus": false
+    },
+    {
+      "id": "hoenn_walter",
+      "name": "Walter",
+      "order": 3,
+      "bonus": false
+    },
+    {
+      "id": "hoenn_fiammetta",
+      "name": "Fiammetta",
+      "order": 4,
+      "bonus": false
+    },
+    {
+      "id": "hoenn_norman",
+      "name": "Norman",
+      "order": 5,
+      "bonus": false
+    },
+    {
+      "id": "hoenn_alice",
+      "name": "Alice",
+      "order": 6,
+      "bonus": false
+    },
+    {
+      "id": "hoenn_tell",
+      "name": "Tell",
+      "order": 7,
+      "bonus": false
+    },
+    {
+      "id": "hoenn_adriano",
+      "name": "Adriano",
+      "order": 8,
+      "bonus": false
+    },
+    {
+      "id": "hoenn_lyris",
+      "name": "Lyris",
+      "order": 9,
+      "bonus": true
+    },
+    {
+      "id": "hoenn_pat",
+      "name": "Pat",
+      "order": 10,
+      "bonus": true
+    }
+  ],
+  "sinnoh": [
+    {
+      "id": "sinnoh_pedro",
+      "name": "Pedro",
+      "order": 1,
+      "bonus": false
+    },
+    {
+      "id": "sinnoh_gardenia",
+      "name": "Gardenia",
+      "order": 2,
+      "bonus": false
+    },
+    {
+      "id": "sinnoh_marzia",
+      "name": "Marzia",
+      "order": 3,
+      "bonus": false
+    },
+    {
+      "id": "sinnoh_omar",
+      "name": "Omar",
+      "order": 4,
+      "bonus": false
+    },
+    {
+      "id": "sinnoh_fannie",
+      "name": "Fannie",
+      "order": 5,
+      "bonus": false
+    },
+    {
+      "id": "sinnoh_ferruccio",
+      "name": "Ferruccio",
+      "order": 6,
+      "bonus": false
+    },
+    {
+      "id": "sinnoh_bianca",
+      "name": "Bianca",
+      "order": 7,
+      "bonus": false
+    },
+    {
+      "id": "sinnoh_corrado",
+      "name": "Corrado",
+      "order": 8,
+      "bonus": false
+    },
+    {
+      "id": "sinnoh_buck",
+      "name": "Buck",
+      "order": 9,
+      "bonus": true
+    },
+    {
+      "id": "sinnoh_elfio",
+      "name": "Elfio",
+      "order": 10,
+      "bonus": true
+    }
+  ]
+}

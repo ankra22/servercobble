@@ -56,3 +56,27 @@ export async function getRegionProgress(
     badges: badgesByTrainer.get(trainer.id) ?? [],
   }));
 }
+
+/** Nomes dos líderes de ginásio vencidos por um treinador, agrupados por região. */
+export async function getTrainerGymProgress(
+  supabase: SupabaseClient<Database>,
+  trainerId: string,
+): Promise<Record<string, string[]>> {
+  const { data, error } = await supabase
+    .from("feed_events")
+    .select("series, gym_leader_name")
+    .eq("type", "gym_defeat")
+    .eq("trainer_id", trainerId);
+
+  if (error) {
+    console.error("Erro ao buscar insígnias do treinador:", error.message);
+    return {};
+  }
+
+  const byRegion: Record<string, string[]> = {};
+  for (const row of data ?? []) {
+    if (!row.series || !row.gym_leader_name) continue;
+    (byRegion[row.series] ??= []).push(row.gym_leader_name);
+  }
+  return byRegion;
+}
