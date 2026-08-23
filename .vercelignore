@@ -1,0 +1,16 @@
+# O .vercelignore substitui o .gitignore pro upload da Vercel CLI (não soma
+# com ele) — por isso listamos tudo aqui de novo, especialmente as pastas
+# gigantes do build do mod Kotlin (não fazem parte do site, nunca deveriam
+# subir).
+
+node_modules
+.next
+.git
+
+collector/mod/.gradle
+collector/mod/build
+collector/ingester/.venv
+collector/ingester/.offset
+
+*.tsbuildinfo
+next-env.d.ts
