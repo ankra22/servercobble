@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getTrainerByUsername, getTrainerCounters, getTrainerPokemons } from "@/lib/queries/trainers";
 import { fetchFeedEvents } from "@/lib/queries/feed";
+import { getTrainerGymProgress } from "@/lib/queries/regions";
+import { REGIONS } from "@/lib/regions";
 import { isSupabaseConfigured } from "@/lib/env";
 import { formatDate } from "@/lib/format";
 import { TrainerAvatar } from "@/components/TrainerAvatar";
-import { BadgeShelf } from "@/components/trainer/BadgeShelf";
+import { RegionBadgeCase } from "@/components/trainer/RegionBadgeCase";
 import { TeamPCTabs } from "@/components/trainer/TeamPCTabs";
 import { StatTile } from "@/components/StatTile";
 import { LiveFeed } from "@/components/feed/LiveFeed";
@@ -41,10 +43,11 @@ export default async function TrainerProfilePage({ params }: PageProps) {
 
   if (!trainer) notFound();
 
-  const [pokemons, counters, recentEvents] = await Promise.all([
+  const [pokemons, counters, recentEvents, gymProgress] = await Promise.all([
     getTrainerPokemons(supabase, trainer.id),
     getTrainerCounters(supabase, trainer.id),
     fetchFeedEvents(supabase, { trainerId: trainer.id, limit: 15 }),
+    getTrainerGymProgress(supabase, trainer.id),
   ]);
 
   const team = pokemons.filter((p) => p.location === "team");
@@ -64,9 +67,16 @@ export default async function TrainerProfilePage({ params }: PageProps) {
 
         <div className="sm:text-right">
           <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-ink-faint">
-            {trainer.badges_count} badge(s)
+            {trainer.badges_count} insígnia{trainer.badges_count === 1 ? "" : "s"}
           </p>
-          <BadgeShelf count={trainer.badges_count} />
+          {trainer.current_series && (
+            <p className="text-xs text-ink-faint">
+              Presente em{" "}
+              <span className="text-brand">
+                {REGIONS.find((r) => r.id === trainer.current_series)?.name ?? trainer.current_series}
+              </span>
+            </p>
+          )}
         </div>
       </section>
 
@@ -75,6 +85,20 @@ export default async function TrainerProfilePage({ params }: PageProps) {
         <StatTile label="Shinies" value={counters.shinyCount} tone="shiny" />
         <StatTile label="Evoluções" value={counters.evolutions} tone="evolution" />
         <StatTile label="Ginásios vencidos" value={counters.gymDefeats} tone="battle" />
+      </section>
+
+      <section className="mt-8">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-dim">Insígnias</h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {REGIONS.map((region) => (
+            <RegionBadgeCase
+              key={region.id}
+              region={region}
+              earnedNames={gymProgress[region.id] ?? []}
+              isCurrent={trainer.current_series === region.id}
+            />
+          ))}
+        </div>
       </section>
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-5">

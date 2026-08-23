@@ -130,6 +130,23 @@ object EventFactory {
      * O ingestor marca esses `game_uuid`s como "team" e todo o resto do
      * treinador como "pc".
      */
+    /** Jogador derrotou um treinador de ginásio de verdade do rctmod (não campeão/Elite Four/rival). */
+    fun gymDefeat(player: ServerPlayer, gymLeaderName: String, series: String): JsonObject {
+        val json = base("gym_defeat")
+        json.add("trainer", trainerJson(player))
+        json.addProperty("gym_leader_name", gymLeaderName)
+        json.addProperty("series", series)
+        return json
+    }
+
+    /** Região/série atual do jogador no rctmod — não gera card, só sincroniza `trainers.current_series`. */
+    fun regionSnapshot(player: ServerPlayer, series: String): JsonObject {
+        val json = base("region_snapshot")
+        json.add("trainer", trainerJson(player))
+        json.addProperty("series", series)
+        return json
+    }
+
     fun teamSnapshot(player: ServerPlayer): JsonObject {
         val json = base("team_snapshot")
         json.add("trainer", trainerJson(player))
