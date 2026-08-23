@@ -8,7 +8,6 @@ const NAV_LINKS = [
   { href: "/", label: "Início" },
   { href: "/regras", label: "Regras" },
   { href: "/feed", label: "Feed" },
-  { href: "/spawns-raros", label: "Spawns raros" },
   { href: "/trainers", label: "Treinadores" },
 ];
 

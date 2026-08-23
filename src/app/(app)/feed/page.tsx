@@ -20,7 +20,7 @@ export default async function HomePage() {
 
   const supabase = await createClient();
   const [events, stats, watchedSpecies] = await Promise.all([
-    fetchFeedEvents(supabase, { limit: 30, excludeRareSpawnRarity: "rare" }),
+    fetchFeedEvents(supabase, { limit: 30 }),
     getServerStats(supabase),
     getWatchedSpeciesList(),
   ]);
