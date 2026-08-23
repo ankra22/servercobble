@@ -66,7 +66,7 @@ export default async function RegionPage({ params }: PageProps) {
 
       {progress.length === 0 ? (
         <p className="rounded-2xl border border-border bg-panel/60 p-6 text-sm text-ink-faint">
-          Ninguém venceu um ginásio dessa região ainda.
+          Ninguém está presente nessa região agora.
         </p>
       ) : (
         <div className="flex flex-col gap-3">
@@ -85,8 +85,14 @@ export default async function RegionPage({ params }: PageProps) {
                       {trainer.display_name}
                     </p>
                     <p className="text-xs text-ink-faint">
-                      Ginásio atual: <span className="text-battle">{current.gymLeaderName}</span>
-                      <span className="ml-1 text-ink-faint">· {formatDate(current.defeatedAt)}</span>
+                      {current ? (
+                        <>
+                          Ginásio atual: <span className="text-battle">{current.gymLeaderName}</span>
+                          <span className="ml-1 text-ink-faint">· {formatDate(current.defeatedAt)}</span>
+                        </>
+                      ) : (
+                        "Ainda não venceu nenhum ginásio aqui."
+                      )}
                     </p>
                   </div>
                   <span className="shrink-0 rounded-full bg-battle-dim/40 px-2.5 py-1 text-xs font-medium text-battle">
@@ -94,16 +100,18 @@ export default async function RegionPage({ params }: PageProps) {
                   </span>
                 </div>
 
-                <div className="mt-3 flex flex-wrap gap-1.5 pl-[59px]">
-                  {badges.map((badge) => (
-                    <span
-                      key={badge.gymLeaderName}
-                      className="rounded-full border border-border bg-bg-elevated px-2.5 py-1 text-xs text-ink-dim"
-                    >
-                      {badge.gymLeaderName}
-                    </span>
-                  ))}
-                </div>
+                {badges.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5 pl-[59px]">
+                    {badges.map((badge) => (
+                      <span
+                        key={badge.gymLeaderName}
+                        className="rounded-full border border-border bg-bg-elevated px-2.5 py-1 text-xs text-ink-dim"
+                      >
+                        {badge.gymLeaderName}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </Link>
             );
           })}

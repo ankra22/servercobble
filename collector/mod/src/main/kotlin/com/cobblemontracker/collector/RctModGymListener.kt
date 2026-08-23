@@ -25,6 +25,10 @@ import org.slf4j.LoggerFactory
 object RctModGymListener {
     private val logger = LoggerFactory.getLogger("cobblemon-tracker-collector")
 
+    /** true só depois de `register()` achar a instância "rctmod" do rctapi. */
+    var isAvailable: Boolean = false
+        private set
+
     fun register() {
         val eventContext = RCTApi.getInstance("rctmod")?.eventContext
         if (eventContext == null) {
@@ -39,7 +43,25 @@ object RctModGymListener {
                 logger.error("Erro processando fim de batalha do rctmod", e)
             }
         }
+        isAvailable = true
         logger.info("Escutando derrotas de treinador do rctmod pra progresso de ginásio.")
+    }
+
+    /**
+     * Região/série atual do jogador no rctmod (ex.: "kanto"), ou `null` se
+     * ele ainda não tem uma série de verdade atribuída (não registrado,
+     * freeroam, etc.) — nesse caso não conta como "presente" em região
+     * nenhuma pro site.
+     */
+    fun currentSeriesFor(player: ServerPlayer): String? {
+        if (!isAvailable) return null
+        return try {
+            val series = RCTMod.getInstance().trainerManager.getData(player)?.currentSeries
+            series?.takeIf { it.isNotBlank() && it != "empty" && it != "freeroam" }
+        } catch (e: Exception) {
+            logger.error("Erro lendo série atual do jogador ${player.gameProfile.name}", e)
+            null
+        }
     }
 
     private fun handleBattleEnded(battle: BattleState) {

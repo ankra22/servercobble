@@ -139,6 +139,14 @@ object EventFactory {
         return json
     }
 
+    /** Região/série atual do jogador no rctmod — não gera card, só sincroniza `trainers.current_series`. */
+    fun regionSnapshot(player: ServerPlayer, series: String): JsonObject {
+        val json = base("region_snapshot")
+        json.add("trainer", trainerJson(player))
+        json.addProperty("series", series)
+        return json
+    }
+
     fun teamSnapshot(player: ServerPlayer): JsonObject {
         val json = base("team_snapshot")
         json.add("trainer", trainerJson(player))

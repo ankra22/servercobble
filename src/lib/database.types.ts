@@ -46,6 +46,7 @@ export interface Database {
           display_name: string;
           skin_url: string | null;
           badges_count: number;
+          current_series: string | null;
           created_at: string;
         };
         Insert: {
@@ -54,6 +55,7 @@ export interface Database {
           display_name: string;
           skin_url?: string | null;
           badges_count?: number;
+          current_series?: string | null;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["trainers"]["Insert"]>;

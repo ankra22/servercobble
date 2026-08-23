@@ -16,16 +16,21 @@ create extension if not exists "pgcrypto";
 -- trainers
 -- ----------------------------------------------------------------------------
 create table if not exists public.trainers (
-  id            uuid primary key default gen_random_uuid(),
-  username      text not null unique,
-  display_name  text not null,
-  skin_url      text,
-  badges_count  integer not null default 0,
-  created_at    timestamptz not null default now()
+  id              uuid primary key default gen_random_uuid(),
+  username        text not null unique,
+  display_name    text not null,
+  skin_url        text,
+  badges_count    integer not null default 0,
+  current_series  text,
+  created_at      timestamptz not null default now()
 );
+
+-- Migração idempotente pra bancos já provisionados antes desta coluna existir.
+alter table public.trainers add column if not exists current_series text;
 
 comment on table public.trainers is 'Jogadores/treinadores do servidor Cobblemon.';
 comment on column public.trainers.username is 'Username exato do Minecraft (usado nas URLs de perfil).';
+comment on column public.trainers.current_series is 'Id da série/região atual do jogador no rctmod (ex.: "kanto") — sincronizado a cada ~60s pelo coletor. Usado pra saber quem está "presente" em cada região em /regioes.';
 
 create index if not exists trainers_username_idx on public.trainers (username);
 

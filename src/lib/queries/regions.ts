@@ -12,35 +12,47 @@ export interface RegionTrainerProgress {
 }
 
 /**
- * Treinadores com pelo menos um ginásio vencido numa região (série do
- * rctmod), com a lista de ginásios vencidos em ordem — o mais recente é o
+ * Treinadores atualmente "presentes" numa região (série atual no rctmod,
+ * sincronizada a cada ~60s pelo coletor via `trainers.current_series`),
+ * junto com os ginásios que cada um já venceu ali — o mais recente é o
  * "atual" (ginásio mais avançado que ele já bateu nessa região).
  */
 export async function getRegionProgress(
   supabase: SupabaseClient<Database>,
   seriesId: string,
 ): Promise<RegionTrainerProgress[]> {
-  const { data, error } = await supabase
-    .from("feed_events")
-    .select("gym_leader_name, created_at, trainer:trainers(id, username, display_name, skin_url)")
-    .eq("type", "gym_defeat")
-    .eq("series", seriesId)
-    .order("created_at", { ascending: true });
+  const [trainersRes, eventsRes] = await Promise.all([
+    supabase
+      .from("trainers")
+      .select("id, username, display_name, skin_url")
+      .eq("current_series", seriesId)
+      .order("badges_count", { ascending: false }),
+    supabase
+      .from("feed_events")
+      .select("trainer_id, gym_leader_name, created_at")
+      .eq("type", "gym_defeat")
+      .eq("series", seriesId)
+      .order("created_at", { ascending: true }),
+  ]);
 
-  if (error) {
-    console.error("Erro ao buscar progresso da região:", error.message);
+  if (trainersRes.error) {
+    console.error("Erro ao buscar treinadores presentes na região:", trainersRes.error.message);
     return [];
   }
-
-  const byTrainer = new Map<string, RegionTrainerProgress>();
-  for (const row of data ?? []) {
-    const trainer = row.trainer as unknown as RegionTrainerProgress["trainer"] | null;
-    if (!trainer || !row.gym_leader_name) continue;
-
-    const entry = byTrainer.get(trainer.id) ?? { trainer, badges: [] };
-    entry.badges.push({ gymLeaderName: row.gym_leader_name, defeatedAt: row.created_at });
-    byTrainer.set(trainer.id, entry);
+  if (eventsRes.error) {
+    console.error("Erro ao buscar ginásios vencidos na região:", eventsRes.error.message);
   }
 
-  return Array.from(byTrainer.values()).sort((a, b) => b.badges.length - a.badges.length);
+  const badgesByTrainer = new Map<string, RegionGymBadge[]>();
+  for (const row of eventsRes.data ?? []) {
+    if (!row.trainer_id || !row.gym_leader_name) continue;
+    const list = badgesByTrainer.get(row.trainer_id) ?? [];
+    list.push({ gymLeaderName: row.gym_leader_name, defeatedAt: row.created_at });
+    badgesByTrainer.set(row.trainer_id, list);
+  }
+
+  return (trainersRes.data ?? []).map((trainer) => ({
+    trainer,
+    badges: badgesByTrainer.get(trainer.id) ?? [],
+  }));
 }

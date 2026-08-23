@@ -82,6 +82,10 @@ object CobblemonTrackerCollector : ModInitializer {
                 tickCounter = 0
                 for (player in server.playerList.players) {
                     TrackerEventWriter.submit(EventFactory.teamSnapshot(player))
+                    val series = RctModGymListener.currentSeriesFor(player)
+                    if (series != null) {
+                        TrackerEventWriter.submit(EventFactory.regionSnapshot(player, series))
+                    }
                 }
             }
         }

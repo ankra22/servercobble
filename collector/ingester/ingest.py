@@ -254,6 +254,13 @@ def process_gym_defeat(event: dict[str, Any]) -> None:
     }).eq("id", trainer_id).execute()
 
 
+def process_region_snapshot(event: dict[str, Any]) -> None:
+    """Sincroniza a região/série atual do jogador no rctmod (roda a cada
+    ~60s, junto do team_snapshot). Não gera card no feed."""
+    trainer_id = upsert_trainer(event["trainer"]["username"])
+    supabase.table("trainers").update({"current_series": event["series"]}).eq("id", trainer_id).execute()
+
+
 def process_team_snapshot(event: dict[str, Any]) -> None:
     """Sincroniza `location` com o time atual do jogador (roda a cada ~60s
     pelo mod). Não gera card no feed — só corrige o time/PC de quem moveu
@@ -281,6 +288,7 @@ HANDLERS = {
     "level_up": process_level_up,
     "rare_spawn": process_rare_spawn,
     "gym_defeat": process_gym_defeat,
+    "region_snapshot": process_region_snapshot,
     "team_snapshot": process_team_snapshot,
 }
 
