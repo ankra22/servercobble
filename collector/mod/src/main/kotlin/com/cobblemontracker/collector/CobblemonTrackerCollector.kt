@@ -26,9 +26,12 @@ object CobblemonTrackerCollector : ModInitializer {
     override fun onInitialize() {
         TrackerEventWriter.start()
 
-        // Precisa rodar depois que o Cobblemon já carregou o spawn pool dele.
+        // Precisa rodar depois que o Cobblemon (e o rctmod, se instalado) já
+        // carregaram — RarityRegistry usa o spawn pool, RctModGymListener
+        // usa a instância "rctmod" do rctapi, registrada no init deles.
         ServerLifecycleEvents.SERVER_STARTED.register {
             RarityRegistry.build()
+            RctModGymListener.register()
         }
 
         // O evento `capture` já carrega `is_shiny` — o card no site já mostra

@@ -112,6 +112,7 @@ export interface Database {
           is_shiny: boolean;
           coordinates: EventCoordinates | null;
           gym_leader_name: string | null;
+          series: string | null;
           message: string | null;
           created_at: string;
           source_event_id: string | null;
@@ -125,6 +126,7 @@ export interface Database {
           is_shiny?: boolean;
           coordinates?: EventCoordinates | null;
           gym_leader_name?: string | null;
+          series?: string | null;
           message?: string | null;
           created_at?: string;
           source_event_id?: string | null;

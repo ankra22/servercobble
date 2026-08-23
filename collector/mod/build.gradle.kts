@@ -30,6 +30,11 @@ dependencies {
 
     // Cobblemon-fabric 1.7.3+1.21.1 — mesma versao instalada no servidor.
     modImplementation("maven.modrinth:cobblemon:${project.property("cobblemon_modrinth_version")}")
+
+    // rctapi/rctmod (Radical Cobblemon Trainers) — mesmas versoes instaladas
+    // no servidor, usadas pra ler progresso de treinador (series/ginasios).
+    modImplementation("maven.modrinth:rctapi:${project.property("rctapi_modrinth_version")}")
+    modImplementation("maven.modrinth:rctmod:${project.property("rctmod_modrinth_version")}")
 }
 
 java {

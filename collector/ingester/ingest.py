@@ -217,6 +217,43 @@ def process_rare_spawn(event: dict[str, Any]) -> None:
     })
 
 
+def process_gym_defeat(event: dict[str, Any]) -> None:
+    """Jogador derrotou um líder de ginásio de verdade do rctmod (não
+    campeão/Elite Four/rival — ver RctModGymListener.kt no mod). Incrementa
+    badges_count só quando a linha do feed é nova de verdade (não um
+    reprocessamento do mesmo source_event_id)."""
+    username = event["trainer"]["username"]
+    trainer_id = upsert_trainer(username)
+    gym_leader_name = event["gym_leader_name"]
+    series = event["series"]
+
+    try:
+        supabase.table("feed_events").insert({
+            "type": "gym_defeat",
+            "trainer_id": trainer_id,
+            "gym_leader_name": gym_leader_name,
+            "series": series,
+            "message": f"{username} derrotou o líder {gym_leader_name}.",
+            "source_event_id": event["source_event_id"],
+        }).execute()
+    except Exception as exc:
+        if is_duplicate_key_error(exc):
+            log.info("Evento %s ja tinha sido processado, ignorando.", event["source_event_id"])
+            return
+        raise
+
+    current = (
+        supabase.table("trainers")
+        .select("badges_count")
+        .eq("id", trainer_id)
+        .single()
+        .execute()
+    )
+    supabase.table("trainers").update({
+        "badges_count": current.data["badges_count"] + 1
+    }).eq("id", trainer_id).execute()
+
+
 def process_team_snapshot(event: dict[str, Any]) -> None:
     """Sincroniza `location` com o time atual do jogador (roda a cada ~60s
     pelo mod). Não gera card no feed — só corrige o time/PC de quem moveu
@@ -243,6 +280,7 @@ HANDLERS = {
     "evolution": process_evolution,
     "level_up": process_level_up,
     "rare_spawn": process_rare_spawn,
+    "gym_defeat": process_gym_defeat,
     "team_snapshot": process_team_snapshot,
 }
 
