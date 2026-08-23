@@ -90,14 +90,14 @@ export default async function DexEntryPage({ params }: PageProps) {
                     {biome}
                   </span>
                 ))}
-                {entry.monuments.map((monument) => (
+                {foundInMonument && (
                   <span
-                    key={monument}
+                    title="Só descobrindo no mundo — nenhuma dica aqui de propósito."
                     className="rounded-full border border-watch/25 bg-watch-dim/30 px-2.5 py-1 text-xs font-medium text-watch"
                   >
-                    Monumento: {monument}
+                    Monumento lendário — ?
                   </span>
-                ))}
+                )}
               </div>
             ) : (
               <p className="text-sm text-ink-faint">Sem local de spawn registrado.</p>
