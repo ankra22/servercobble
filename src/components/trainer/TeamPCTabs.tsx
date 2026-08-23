@@ -20,7 +20,7 @@ export function TeamPCTabs({ team, pc }: { team: Pokemon[]; pc: Pokemon[] }) {
           {tab === "team" ? "Nenhum Pokémon no time no momento." : "PC vazio."}
         </div>
       ) : (
-        <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 items-start gap-2.5 sm:grid-cols-2">
           {active.map((pokemon) => (
             <PokemonCard key={pokemon.id} pokemon={pokemon} />
           ))}
