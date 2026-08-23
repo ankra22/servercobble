@@ -90,6 +90,7 @@ create table if not exists public.feed_events (
   coordinates     jsonb,
   gym_leader_name text,
   series          text,
+  rank            text check (rank in ('gym', 'elite_four', 'champion')),
   message         text,
   created_at      timestamptz not null default now(),
   source_event_id uuid unique,
@@ -101,13 +102,15 @@ create table if not exists public.feed_events (
 alter table public.feed_events add column if not exists source_event_id uuid unique;
 alter table public.feed_events add column if not exists rarity text check (rarity in ('rare', 'ultra-rare'));
 alter table public.feed_events add column if not exists series text;
+alter table public.feed_events add column if not exists rank text check (rank in ('gym', 'elite_four', 'champion'));
 
 comment on table public.feed_events is 'Linha do tempo de eventos capturados dos logs do servidor, exibida no feed ao vivo.';
 comment on column public.feed_events.rarity is 'Só preenchido em eventos "rare_spawn": raridade do bucket de spawn do Cobblemon ("rare" ou "ultra-rare"). O feed principal só mostra ultra-rare; a aba "Spawns raros" mostra os dois.';
 comment on column public.feed_events.coordinates is 'Coordenadas do evento em jsonb, ex: {"x":120,"y":64,"z":-340,"dimension":"overworld"}.';
 comment on column public.feed_events.message is 'Texto humano pronto, gerado pelo script Python; a UI usa como legenda principal do card.';
 comment on column public.feed_events.source_event_id is 'UUID gerado pelo coletor no momento do evento — evita duplicar a linha do feed se o ingestor reprocessar o arquivo de eventos.';
-comment on column public.feed_events.series is 'Só preenchido em eventos "gym_defeat": id da série/região do rctmod que o ginásio pertence (ex.: "kanto", "johto", "hoenn", "sinnoh") — usado pela aba /regioes.';
+comment on column public.feed_events.series is 'Só preenchido em eventos "gym_defeat": id da série/região do rctmod que o treinador pertence (ex.: "kanto", "johto", "hoenn", "sinnoh") — usado pela aba /regioes.';
+comment on column public.feed_events.rank is 'Só preenchido em eventos "gym_defeat": "gym" (líder de ginásio), "elite_four" ou "champion".';
 
 create index if not exists feed_events_created_at_idx on public.feed_events (created_at desc);
 create index if not exists feed_events_trainer_id_idx on public.feed_events (trainer_id);

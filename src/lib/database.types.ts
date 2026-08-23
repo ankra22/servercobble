@@ -10,6 +10,8 @@ export type PokemonLocation = "team" | "pc";
 
 export type SpawnRarity = "rare" | "ultra-rare";
 
+export type GymRank = "gym" | "elite_four" | "champion";
+
 export type FeedEventType =
   | "rare_spawn"
   | "capture"
@@ -115,6 +117,7 @@ export interface Database {
           coordinates: EventCoordinates | null;
           gym_leader_name: string | null;
           series: string | null;
+          rank: GymRank | null;
           message: string | null;
           created_at: string;
           source_event_id: string | null;
@@ -129,6 +132,7 @@ export interface Database {
           coordinates?: EventCoordinates | null;
           gym_leader_name?: string | null;
           series?: string | null;
+          rank?: GymRank | null;
           message?: string | null;
           created_at?: string;
           source_event_id?: string | null;
