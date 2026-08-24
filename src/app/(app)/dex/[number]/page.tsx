@@ -65,7 +65,7 @@ export default async function DexEntryPage({ params }: PageProps) {
 
         <div className="mt-6 grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
           <div>
-            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-faint">Raridade</p>
+            <p className="mb-1.5 font-pixel text-[9px] uppercase tracking-wide text-ink-faint">Raridade</p>
             {rarityLabel ? (
               <span className="inline-flex items-center rounded-full bg-rare-dim/40 px-2.5 py-1 text-xs font-semibold text-rare">
                 {rarityLabel}
@@ -76,7 +76,7 @@ export default async function DexEntryPage({ params }: PageProps) {
           </div>
 
           <div>
-            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-faint">
+            <p className="mb-1.5 font-pixel text-[9px] uppercase tracking-wide text-ink-faint">
               Onde encontrar
             </p>
             {foundInWild || entry.hasMonument ? (

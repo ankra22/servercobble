@@ -49,6 +49,7 @@ supabase/.temp
 
 # Claude Code local settings (permissions específicas desta máquina)
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
 
 # typescript
 *.tsbuildinfo

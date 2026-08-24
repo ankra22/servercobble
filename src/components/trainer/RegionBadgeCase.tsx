@@ -64,7 +64,7 @@ export function RegionBadgeCase({
     if (slots.length === 0) return null;
     return (
       <div>
-        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-ink-faint">{label}</p>
+        <p className="mb-1.5 font-pixel text-[9px] uppercase tracking-wide text-ink-faint">{label}</p>
         <div className="flex flex-wrap gap-x-3 gap-y-2">
           {slots.map((gym) => {
             const isEarned = earned.has(gym.name);

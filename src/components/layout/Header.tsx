@@ -21,7 +21,9 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/feed" className="group flex items-center gap-2.5">
           <RadarMark className="h-7 w-7 text-brand transition-transform duration-300 group-hover:rotate-45" />
-          <span className="font-semibold tracking-tight text-ink">Cobblemon do Rafaum</span>
+          <span className="font-pixel text-[11px] leading-none tracking-tight text-ink">
+            Cobblemon <span className="text-brand">do Rafaum</span>
+          </span>
         </Link>
 
         <nav className="flex items-center gap-1 2xl:hidden">

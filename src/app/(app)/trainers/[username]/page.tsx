@@ -67,7 +67,7 @@ export default async function TrainerProfilePage({ params }: PageProps) {
         </div>
 
         <div className="sm:text-right">
-          <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-ink-faint">
+          <p className="mb-1.5 font-pixel text-[9px] uppercase tracking-wide text-ink-faint">
             {trainer.badges_count} insígnia{trainer.badges_count === 1 ? "" : "s"}
           </p>
           {trainer.current_series && (
@@ -90,7 +90,7 @@ export default async function TrainerProfilePage({ params }: PageProps) {
 
       <details className="group mt-8 rounded-2xl border border-border bg-panel/60">
         <summary className="flex cursor-pointer list-none items-center justify-between p-4 [&::-webkit-details-marker]:hidden">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-dim">Insígnias</h2>
+          <h2 className="font-pixel text-[10px] uppercase tracking-wide text-ink-dim">Insígnias</h2>
           <span className="flex items-center gap-2 text-xs text-ink-faint">
             {trainer.badges_count} conquistada{trainer.badges_count === 1 ? "" : "s"}
             <ChevronMark className="h-4 w-4 transition-transform duration-200 group-open:rotate-180" />
@@ -110,12 +110,12 @@ export default async function TrainerProfilePage({ params }: PageProps) {
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-5">
         <section className="lg:col-span-3">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-dim">Pokémon</h2>
+          <h2 className="mb-3 font-pixel text-[10px] uppercase tracking-wide text-ink-dim">Pokémon</h2>
           <TeamPCTabs team={team} pc={pc} />
         </section>
 
         <section className="lg:col-span-2">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-dim">Atividade recente</h2>
+          <h2 className="mb-3 font-pixel text-[10px] uppercase tracking-wide text-ink-dim">Atividade recente</h2>
           <LiveFeed
             key={trainer.id}
             initialEvents={recentEvents}

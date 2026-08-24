@@ -1,42 +1,44 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   Design tokens — tema fixo, escuro, inspirado numa tela de PC de Pokémon /
-   terminal de laboratório. Os tokens --color-* viram automaticamente
-   utilitários Tailwind (bg-brand, text-shiny, border-rare, etc).
+   Design tokens — "Terminal de Laboratório": tema fixo, escuro, verde-
+   fósforo, inspirado num terminal de PC de Pokémon de verdade (tela CRT,
+   não um dashboard SaaS genérico). Os tokens --color-* viram
+   automaticamente utilitários Tailwind (bg-brand, text-shiny, border-rare,
+   etc).
    ========================================================================== */
 :root {
-  --color-bg: #090c0b;
-  --color-bg-elevated: #0f1613;
-  --color-panel: #121a17;
-  --color-panel-hover: #17211d;
-  --color-border: #1e2b26;
-  --color-border-strong: #2a3a33;
-  --color-ink: #e9f3ee;
-  --color-ink-dim: #9db3aa;
-  --color-ink-faint: #63776e;
+  --color-bg: #070b09;
+  --color-bg-elevated: #0c130f;
+  --color-panel: #0f1a14;
+  --color-panel-hover: #142219;
+  --color-border: #1d3527;
+  --color-border-strong: #2c4d38;
+  --color-ink: #d8f5e4;
+  --color-ink-dim: #7fa891;
+  --color-ink-faint: #4d6b5a;
 
-  --color-brand: #2dd4bf;
-  --color-brand-dim: #12433c;
+  --color-brand: #7bffb0;
+  --color-brand-dim: #0f3322;
 
-  --color-rare: #fbbf24;
-  --color-rare-dim: #4a380f;
-  --color-capture: #4ade80;
-  --color-capture-dim: #163a22;
-  --color-battle: #fb7185;
-  --color-battle-dim: #46141d;
-  --color-evolution: #a78bfa;
-  --color-evolution-dim: #2c2350;
-  --color-levelup: #38bdf8;
+  --color-rare: #ffe066;
+  --color-rare-dim: #4a3c0a;
+  --color-capture: #7bffb0;
+  --color-capture-dim: #0f3322;
+  --color-battle: #ff5c7a;
+  --color-battle-dim: #4a1420;
+  --color-evolution: #c792ff;
+  --color-evolution-dim: #33204a;
+  --color-levelup: #5cc8ff;
   --color-levelup-dim: #0e3348;
-  --color-shiny: #facc15;
+  --color-shiny: #ffe066;
   --color-shiny-dim: #4a3c0a;
 
   /* Destaque de "Pokémon que você está de olho" (preferência salva) — eixo
      separado dos tons de evento acima, por isso um vermelho mais puro/vivo
      do que o --color-battle (rosado, específico de ginásio). */
-  --color-watch: #ef4444;
-  --color-watch-dim: #450a0a;
+  --color-watch: #ff3b5c;
+  --color-watch-dim: #4a0f18;
 }
 
 @theme inline {
@@ -71,6 +73,7 @@
 
   --font-sans: var(--font-display);
   --font-mono: var(--font-data);
+  --font-pixel: var(--font-pixel);
 
   --animate-slide-in: slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-pulse-live: pulse-live 2s ease-in-out infinite;
@@ -93,21 +96,21 @@
   0%,
   100% {
     opacity: 1;
-    box-shadow: 0 0 0 0 rgb(45 212 191 / 0.55);
+    box-shadow: 0 0 0 0 rgb(123 255 176 / 0.55);
   }
   50% {
     opacity: 0.7;
-    box-shadow: 0 0 0 6px rgb(45 212 191 / 0);
+    box-shadow: 0 0 0 6px rgb(123 255 176 / 0);
   }
 }
 
 @keyframes pulse-watch {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgb(239 68 68 / 0.45);
+    box-shadow: 0 0 0 0 rgb(255 59 92 / 0.45);
   }
   50% {
-    box-shadow: 0 0 0 8px rgb(239 68 68 / 0);
+    box-shadow: 0 0 0 8px rgb(255 59 92 / 0);
   }
 }
 
@@ -132,15 +135,42 @@ body {
   background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 19px;
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(45 212 191 / 0.08), transparent),
-    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(123 255 176 / 0.08), transparent),
+    linear-gradient(rgb(123 255 176 / 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(123 255 176 / 0.03) 1px, transparent 1px);
   background-size:
     100% 100%,
     28px 28px,
     28px 28px;
   background-attachment: fixed;
+  position: relative;
+}
+
+/* Scanline sutil de CRT sobre a tela inteira — decorativo, não intercepta clique. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgb(0 0 0 / 0.1) 0px,
+    rgb(0 0 0 / 0.1) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+}
+
+/* Rótulos curtos e de marca (nav, tags de evento, títulos de página) — a
+   Press Start 2P é ilegível em textos longos, por isso não é a fonte de
+   texto padrão do site, só um acento aplicado à mão nesses pontos. */
+.font-pixel {
+  font-family: var(--font-pixel), monospace;
 }
 
 ::selection {
@@ -206,8 +236,8 @@ body {
   background-color: color-mix(in srgb, var(--color-bg) 74%, transparent);
   background-image:
     radial-gradient(ellipse 65% 55% at 50% 8%, color-mix(in srgb, var(--glow) 24%, transparent), transparent 70%),
-    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+    linear-gradient(rgb(123 255 176 / 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(123 255 176 / 0.03) 1px, transparent 1px);
   background-size:
     100% 100%,
     32px 32px,

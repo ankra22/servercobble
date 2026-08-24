@@ -28,7 +28,7 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <section className="mb-8 rounded-3xl border border-border px-6 py-10 sm:px-8 sm:py-14">
-        <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">Feed do servidor</h1>
+        <h1 className="font-pixel text-base text-ink sm:text-lg">Feed do servidor</h1>
         <p className="mt-1.5 max-w-md text-sm text-ink-dim">
           Capturas, shinies, evoluções e batalhas de ginásio, direto dos logs — sem atualizar a página.
         </p>

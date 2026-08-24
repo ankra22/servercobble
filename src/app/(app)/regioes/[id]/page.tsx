@@ -56,11 +56,11 @@ export default async function RegionPage({ params }: PageProps) {
         className="mb-8 overflow-hidden rounded-3xl border border-border bg-panel/60 bg-cover bg-center px-6 py-10 sm:px-8 sm:py-14"
         style={{ backgroundImage: `linear-gradient(180deg, rgba(6,0,16,0.35), rgba(6,0,16,0.85)), url(${region.image})` }}
       >
-        <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">{region.name}</h1>
+        <h1 className="font-pixel text-lg text-white sm:text-xl">{region.name}</h1>
         <p className="mt-1.5 max-w-md text-sm text-white/80">{region.description}</p>
       </section>
 
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-dim">
+      <h2 className="mb-3 font-pixel text-[10px] uppercase tracking-wide text-ink-dim">
         Treinadores em {region.name}
       </h2>
 

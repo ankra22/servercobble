@@ -48,7 +48,7 @@ export function FeedEventCard({ event, isNew = false, isWatched = false }: FeedE
                 Você quer esse!
               </span>
             )}
-            <span className={`text-[11px] font-semibold uppercase tracking-wider ${tone.text}`}>
+            <span className={`font-pixel text-[8px] uppercase tracking-wider ${tone.text}`}>
               {config.label}
             </span>
             {event.is_shiny && (

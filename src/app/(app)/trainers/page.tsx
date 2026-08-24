@@ -22,7 +22,7 @@ export default async function TrainersPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">Treinadores</h1>
+      <h1 className="font-pixel text-lg text-ink sm:text-xl">Treinadores</h1>
       <p className="mt-1.5 text-sm text-ink-dim">{trainers.length} treinador(es) registrados no servidor.</p>
 
       <div className="mt-6">

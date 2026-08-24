@@ -28,7 +28,7 @@ export default function RegrasPage() {
       <FixedVideoBackground src="/regras-reel.mp4" />
       <div className="relative z-10 mx-auto max-w-3xl px-4 py-10 sm:px-6">
         <div className="rounded-3xl border border-border bg-bg/75 p-6 backdrop-blur-sm sm:p-8">
-          <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">Regras</h1>
+          <h1 className="font-pixel text-lg text-ink sm:text-xl">Regras</h1>
           <p className="mt-1.5 text-sm text-ink-dim">Como funciona a largada do servidor e a corrida por Kanto.</p>
 
           <div className="mt-8 space-y-4">
