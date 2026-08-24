@@ -144,6 +144,49 @@
 }
 
 /* --------------------------------------------------------------------------
+   Zoom do sprite no hover.
+
+   `transform: scale()` de propósito, nunca width/height: a lista é densa e o
+   Realtime insere evento no topo o tempo todo, então mexer em dimensão custaria
+   reflow do feed inteiro a cada passada de mouse. Transform fica no compositor
+   e não toca no layout — as linhas vizinhas não se movem.
+
+   `position: relative` não é enfeite: o wrapper tem a altura da linha de texto
+   (20px) e o sprite, de 28 ou 44px, já transborda dele. Sem elemento posicionado
+   o sprite ampliado passaria por baixo do fundo e da borda de 1px da linha
+   seguinte, e o zoom apareceria cortado.
+
+   O `image-rendering: pixelated` vem do `.pixelated` no globals e sobrevive à
+   escala — a ampliação mantém a aresta dura do pixel art, que é o desejado.
+   Nenhum suavizamento é introduzido aqui.
+
+   prefers-reduced-motion é atendido pelo bloco no fim deste arquivo, que zera
+   `transition-duration` em tudo sob `.feed`: a ampliação continua acontecendo,
+   só que sem percurso.
+   -------------------------------------------------------------------------- */
+.fd-sprite {
+  --fd-sprite-zoom: 1.5;
+  position: relative;
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fd-sprite:hover {
+  z-index: 3;
+  transform: scale(var(--fd-sprite-zoom));
+}
+
+/* Escala calibrada por tier para o crescimento ABSOLUTO ficar parecido nos dois
+   (~+28px): 28 → 56px e 44 → 73px. Com a mesma escala nos dois, o destaque —
+   que já parte de 44px — dominaria a linha. */
+.fd-sprite--standard {
+  --fd-sprite-zoom: 2;
+}
+
+.fd-sprite--highlight {
+  --fd-sprite-zoom: 1.65;
+}
+
+/* --------------------------------------------------------------------------
    Chips de filtro — quadrado, aresta dura, sem pílula.
    -------------------------------------------------------------------------- */
 .fd-chip {
