@@ -1,174 +1,214 @@
 "use client";
 
-import { useCallback, useId, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import type { FeedEventWithTrainer } from "@/lib/database.types";
-import type { FeedTier } from "@/lib/feed-events";
-import { FEED_EVENT_CONFIG, feedTier } from "@/lib/feed-events";
-import { groupFeedEvents } from "@/lib/feed-grouping";
+import { feedTier, type FeedTier } from "@/lib/feed-events";
+import { groupFeedEvents, type FeedRow } from "@/lib/feed-grouping";
 import { dayKey, formatClock, formatDayLabel } from "@/lib/format";
-import { TONE_CLASSES } from "@/lib/tone-classes";
-import { FeedEventCard } from "@/components/feed/FeedEventCard";
+import { FeedEventRow } from "@/components/feed/FeedEventRow";
 import { FeedLevelRunRow } from "@/components/feed/FeedLevelRunRow";
 
 interface FeedTimelineProps {
-  /** Já filtrada e ordenada do mais novo pro mais velho. */
   events: FeedEventWithTrainer[];
   newIds: Set<string>;
   watchedSpecies: string[];
 }
 
 /**
- * Trilho vertical: cada evento é um nó, e o tamanho/brilho do nó codifica a
- * raridade. As colunas são `[horário] [nó] [conteúdo]`, e a troca pra versão
- * compacta usa container query (`@md`) em vez de breakpoint de viewport —
- * o mesmo componente serve o feed largo e a coluna estreita do perfil do
- * treinador, que continua sendo desktop.
+ * O trilho.
+ *
+ * ALINHAMENTO: a célula do horário e a do nó têm altura fixa `h-5` — a mesma
+ * altura de linha do texto — com `items-center`. Elas se centram sozinhas na
+ * primeira linha do conteúdo, em qualquer tier e com qualquer tamanho de nó.
+ * A versão anterior calculava um offset (`--node-y`) no papel e errava na
+ * tela; aqui o alinhamento é estrutural, não aritmético.
+ *
+ * LARGURA: container query, não media query. O perfil do treinador usa este
+ * mesmo componente numa coluna estreita em desktop — `sm:` já estaria ativo lá
+ * e espremeria a coluna de horário. `@container` responde à largura do próprio
+ * trilho, então o mesmo componente serve os dois contextos sem prop de
+ * densidade.
  */
 export function FeedTimeline({ events, newIds, watchedSpecies }: FeedTimelineProps) {
   const rows = useMemo(() => groupFeedEvents(events), [events]);
-  const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set<string>());
-  const panelPrefix = useId();
+  const watched = useMemo(
+    () => new Set(watchedSpecies.map((s) => s.toLowerCase())),
+    [watchedSpecies],
+  );
 
-  const toggle = useCallback((key: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  }, []);
+  const isWatched = (species: string | null) => !!species && watched.has(species.toLowerCase());
 
-  const items: ReactNode[] = [];
-  let lastDay = "";
+  // Divisor de dia resolvido antes do JSX, comparando cada linha com a
+  // anterior em vez de carregar um acumulador mutável: reatribuir durante o
+  // render é o que o react-hooks/immutability recusa (e o que quebraria sob
+  // React Compiler). Em i = 0, `keys[-1]` é undefined, então a primeira linha
+  // sempre abre um divisor.
+  const days = useMemo(() => {
+    const leads = rows.map((row) => (row.kind === "event" ? row.event : row.events[0]));
+    const keys = leads.map((lead) => dayKey(lead.created_at));
 
-  for (const row of rows) {
-    const anchor = row.kind === "event" ? row.event : row.events[0];
-    const day = dayKey(anchor.created_at);
-
-    if (day !== lastDay) {
-      lastDay = day;
-      items.push(<DaySeparator key={`day-${day}`} iso={anchor.created_at} />);
-    }
-
-    if (row.kind === "levelup-run") {
-      items.push(
-        <TimelineRow
-          key={row.key}
-          iso={anchor.created_at}
-          tier="ambient"
-          tone="levelup"
-          isNew={row.events.some((e) => newIds.has(e.id))}
-        >
-          <FeedLevelRunRow
-            events={row.events}
-            from={row.from}
-            to={row.to}
-            expanded={expanded.has(row.key)}
-            onToggle={() => toggle(row.key)}
-            panelId={`${panelPrefix}-${row.key}`}
-          />
-        </TimelineRow>,
-      );
-      continue;
-    }
-
-    const event = row.event;
-    const isWatched = Boolean(event.species) && watchedSpecies.includes(event.species!.toLowerCase());
-    const tier = feedTier(event, isWatched);
-
-    items.push(
-      <TimelineRow
-        key={row.key}
-        iso={event.created_at}
-        tier={tier}
-        tone={isWatched ? "watch" : FEED_EVENT_CONFIG[event.type].tone}
-        isNew={newIds.has(event.id)}
-      >
-        <FeedEventCard event={event} tier={tier} isWatched={isWatched} />
-      </TimelineRow>,
-    );
-  }
+    return rows.map((row, i) => ({ row, lead: leads[i], showDay: keys[i] !== keys[i - 1] }));
+  }, [rows]);
 
   return (
-    <ol className="@container">{items}</ol>
+    <div className="@container">
+      <div className="relative">
+        {/* Trilho: fio contínuo atrás da coluna dos nós. Fica absoluto pra
+            não deixar furo entre linhas nem depender do espaçamento delas.
+            O `left` é o centro da coluna dos nós e precisa acompanhar a grade
+            da linha: no estreito, metade de 1.25rem; no largo, 3.5rem da
+            coluna do horário + 0.75rem de gap-x-3 + 0.625rem. */}
+        <span
+          aria-hidden="true"
+          className="fd-rail absolute bottom-2 top-2 w-px left-[0.625rem] @[26rem]:left-[4.875rem]"
+        />
+
+        <ol className="relative">
+          {days.map(({ row, lead, showDay }) => (
+            <li key={row.key}>
+              {showDay && <DayDivider iso={lead.created_at} />}
+              <TimelineRow row={row} newIds={newIds} isWatched={isWatched} />
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
   );
 }
 
-/** Altura do nó a partir do topo da linha, medida pra cair no meio da
- *  primeira linha de conteúdo: nos cards é o padding (1rem) + meia linha de
- *  texto; no ambiente, que não tem caixa, é só meia linha. */
-const NODE_Y: Record<FeedTier, string> = {
-  highlight: "1.4rem",
-  standard: "1.4rem",
-  ambient: "0.65rem",
-};
-
-const NODE_SHAPE: Record<FeedTier, string> = {
-  highlight: "h-3 w-3 ring-2",
-  standard: "h-2 w-2",
-  ambient: "h-2 w-2 border border-border-strong",
-};
-
-/**
- * Sem `gap` vertical na lista: o espaçamento vive no padding da linha, então
- * o segmento de trilho de cada linha encosta no da seguinte e a linha sai
- * contínua por construção, sem número mágico de offset.
- */
-const ROW_GRID =
-  "grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-3 @md:grid-cols-[3.5rem_1.25rem_minmax(0,1fr)]";
+function DayDivider({ iso }: { iso: string }) {
+  return (
+    <div className="grid grid-cols-[1.25rem_1fr] @[26rem]:grid-cols-[3.5rem_1.25rem_1fr] items-center gap-x-3 pb-2 pt-6 first:pt-0">
+      <span className="hidden @[26rem]:block" />
+      <span className="h-5" />
+      <h3 className="fd-pixel" style={{ color: "var(--fd-ink-3)" }}>
+        {formatDayLabel(iso)}
+      </h3>
+    </div>
+  );
+}
 
 function TimelineRow({
+  row,
+  newIds,
+  isWatched,
+}: {
+  row: FeedRow;
+  newIds: Set<string>;
+  isWatched: (species: string | null) => boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  if (row.kind === "levelup-run") {
+    const lead = row.events[0];
+    const watched = isWatched(lead.species);
+    const tier: FeedTier = watched ? "standard" : "ambient";
+
+    return (
+      <>
+        <RowShell
+          iso={lead.created_at}
+          tier={tier}
+          watched={watched}
+          isNew={newIds.has(lead.id)}
+          hit
+        >
+          <FeedLevelRunRow
+            run={row}
+            expanded={expanded}
+            onToggle={() => setExpanded((v) => !v)}
+          />
+        </RowShell>
+
+        {expanded &&
+          row.events.map((event) => (
+            <RowShell key={event.id} iso={event.created_at} tier="ambient" watched={false} nested>
+              <FeedEventRow event={event} tier="ambient" watched={false} />
+            </RowShell>
+          ))}
+      </>
+    );
+  }
+
+  const { event } = row;
+  const watched = isWatched(event.species);
+  const tier = feedTier(event, watched);
+
+  return (
+    <RowShell iso={event.created_at} tier={tier} watched={watched} isNew={newIds.has(event.id)}>
+      <FeedEventRow event={event} tier={tier} watched={watched} />
+    </RowShell>
+  );
+}
+
+/**
+ * A casca de uma linha: horário · nó · conteúdo.
+ * Não sabe nada sobre o evento — só sobre posição e raridade.
+ */
+function RowShell({
   iso,
   tier,
-  tone,
-  isNew,
+  watched,
+  isNew = false,
+  hit = false,
+  nested = false,
   children,
 }: {
   iso: string;
   tier: FeedTier;
-  tone: keyof typeof TONE_CLASSES;
-  isNew: boolean;
-  children: ReactNode;
+  watched: boolean;
+  isNew?: boolean;
+  hit?: boolean;
+  nested?: boolean;
+  children: React.ReactNode;
 }) {
-  const toneClasses = TONE_CLASSES[tone];
+  const rowTone =
+    tier === "highlight" && watched
+      ? "fd-row--watch"
+      : tier === "highlight"
+        ? "fd-row--highlight"
+        : watched
+          ? "fd-row--watch"
+          : "";
 
   return (
-    <li
-      className={`${ROW_GRID} py-1.5 ${isNew ? "animate-slide-in" : ""}`}
-      style={{ "--node-y": NODE_Y[tier] } as CSSProperties}
+    <div
+      className={[
+        "fd-row grid grid-cols-[1.25rem_1fr] @[26rem]:grid-cols-[3.5rem_1.25rem_1fr]",
+        "items-start gap-x-3 py-2.5 pr-1",
+        rowTone,
+        hit ? "fd-row-hit" : "",
+        isNew ? "fd-enter" : "",
+        nested ? "opacity-70" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
+      {/* Horário — some no estreito e reaparece inline no conteúdo. */}
       <time
         dateTime={iso}
-        className="hidden -translate-y-1/2 pt-[var(--node-y)] text-right font-data text-[11px] leading-none text-ink-faint @md:block"
+        className="fd-mono hidden h-5 items-center justify-end text-[11px] @[26rem]:flex"
+        style={{ color: "var(--fd-ink-3)" }}
       >
         {formatClock(iso)}
       </time>
 
-      <span aria-hidden className="relative">
-        <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-border" />
+      {/* Nó. h-5 + items-center = centra na primeira linha de texto. */}
+      <span className="flex h-5 items-center justify-center">
         <span
-          className={`absolute left-1/2 top-[var(--node-y)] -translate-x-1/2 -translate-y-1/2 rounded-full ${NODE_SHAPE[tier]} ${
-            tier === "ambient" ? "bg-bg" : `${toneClasses.dot} ${toneClasses.ring}`
-          }`}
+          aria-hidden="true"
+          className={[
+            "fd-node",
+            `fd-node--${tier}`,
+            watched ? "fd-node--watch" : "",
+            nested ? "opacity-60" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
         />
       </span>
 
       <div className="min-w-0">{children}</div>
-    </li>
-  );
-}
-
-function DaySeparator({ iso }: { iso: string }) {
-  return (
-    <li className={ROW_GRID}>
-      <span className="hidden @md:block" />
-      <span aria-hidden className="relative">
-        <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-border" />
-      </span>
-      <h2 className="flex items-center gap-3 py-3 font-data text-[10px] uppercase tracking-[0.2em] text-ink-faint">
-        {formatDayLabel(iso)}
-        <span aria-hidden className="h-px flex-1 bg-border" />
-      </h2>
-    </li>
+    </div>
   );
 }

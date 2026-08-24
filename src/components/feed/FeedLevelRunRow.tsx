@@ -1,64 +1,65 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import type { FeedEventWithTrainer } from "@/lib/database.types";
-import { fallbackMessage } from "@/lib/feed-message";
-import { formatClock, toTitleCase } from "@/lib/format";
+import type { FeedRow } from "@/lib/feed-grouping";
+import { toTitleCase } from "@/lib/format";
 
-interface FeedLevelRunRowProps {
-  /** Corrida de level ups consecutivos, do mais novo pro mais velho. */
-  events: FeedEventWithTrainer[];
-  from: number | null;
-  to: number | null;
-  expanded: boolean;
-  onToggle: () => void;
-  panelId: string;
-}
+type LevelRun = Extract<FeedRow, { kind: "levelup-run" }>;
 
 /**
- * Uma corrida inteira de level up numa linha só — é isso que impede 14 level
- * ups seguidos de enterrarem uma captura shiny. Clicar expande os eventos
- * individuais.
+ * A corrida de level ups colapsada. Esta é a linha que resolve o problema real
+ * do feed: 14 level ups seguidos do mesmo Persian enterravam uma captura
+ * shiny. Agora é uma linha de ambiente só, expansível.
+ *
+ * A contagem vive em mono e é o único número da linha — o "×14" é a
+ * informação, não o texto.
  */
-export function FeedLevelRunRow({ events, from, to, expanded, onToggle, panelId }: FeedLevelRunRowProps) {
-  const newest = events[0];
-  const species = newest.species ? toTitleCase(newest.species) : "Um Pokémon";
-  const trainer = newest.trainer?.display_name ?? "um treinador";
-  // Sem intervalo o texto degrada pro genérico — o parse do nível depende do
-  // formato de mensagem do ingest.py (ver parseLevelRange).
-  const range = from !== null && to !== null ? `subiu do nível ${from} ao ${to}` : "subiu de nível";
+export function FeedLevelRunRow({
+  run,
+  expanded,
+  onToggle,
+}: {
+  run: LevelRun;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const lead = run.events[0];
+  const count = run.events.length;
+  const species = lead.species ? toTitleCase(lead.species) : "Pokémon";
+  const trainer = lead.trainer?.display_name;
+  const hasRange = run.from !== null && run.to !== null;
+
+  const panelId = `run-${run.key}`;
 
   return (
-    <div>
+    <div className="min-w-0">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={expanded}
         aria-controls={panelId}
-        className="flex w-full items-baseline gap-2 text-left text-xs leading-5 text-ink-faint transition-colors hover:text-ink-dim focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        className="flex w-full min-w-0 items-center gap-2 text-left"
       >
-        <span className="min-w-0 flex-1">
-          <span className="font-medium text-ink-dim">{species}</span> de {trainer} {range}
+        <span className="min-w-0 flex-1 truncate text-[12px] leading-5" style={{ color: "var(--fd-ink-3)" }}>
+          <span style={{ color: "var(--fd-ink-2)", fontWeight: 600 }}>{species}</span>
+          {trainer ? ` de ${trainer}` : ""}
+          {hasRange ? ` subiu do nível ${run.from} ao ${run.to}` : " subiu de nível"}
         </span>
-        <span className="shrink-0 font-data text-[10px] text-ink-faint">×{events.length}</span>
+
+        <span className="fd-mono shrink-0 text-[11px]" style={{ color: "var(--fd-ink-2)" }}>
+          &times;{count}
+        </span>
+
         <ChevronDown
-          aria-hidden
-          className={`h-3.5 w-3.5 shrink-0 self-center transition-transform ${expanded ? "rotate-180" : ""}`}
+          aria-hidden="true"
+          className={`h-3.5 w-3.5 shrink-0 transition-transform ${expanded ? "rotate-180" : ""}`}
+          style={{ color: "var(--fd-ink-3)" }}
         />
       </button>
 
-      {expanded && (
-        <ul id={panelId} className="mt-1.5 space-y-1 border-l border-border pl-3">
-          {events.map((event) => (
-            <li key={event.id} className="flex items-baseline gap-2 text-[11px] leading-5 text-ink-faint">
-              <time dateTime={event.created_at} className="shrink-0 font-data">
-                {formatClock(event.created_at)}
-              </time>
-              <span className="min-w-0 flex-1">{event.message?.trim() || fallbackMessage(event)}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <span id={panelId} className="sr-only">
+        {expanded ? `${count} eventos de level up expandidos` : ""}
+      </span>
     </div>
   );
 }

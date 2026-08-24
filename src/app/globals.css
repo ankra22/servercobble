@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../components/feed/feed-theme.css";
 
 /* ==========================================================================
    Design tokens — tema fixo, escuro, inspirado numa tela de PC de Pokémon /
@@ -257,27 +258,6 @@ body {
     0 100%,
     0 var(--chamfer)
   );
-}
-
-/* "Quem é esse Pokémon?" — sprite de spawn que ainda não é de ninguém.
-   `brightness(0)` achata o sprite numa massa sólida; o `invert(1)` é o ajuste
-   pro tema escuro, onde uma silhueta preta sobre painel #0f1613 seria
-   invisível. Sem transição de propósito: o estado é um fato, não um efeito.
-
-   A opacidade segura a intensidade pra silhueta não passar por cima da
-   hierarquia: branco puro daria ~17,7:1 sobre o painel, acima do --color-shiny
-   (~11,6:1) que é a cor do tier de destaque — um spawn "rare", que é tier
-   padrão, ficaria mais berrante que o destaque. Em 0.55 fica ~6,1:1: ainda
-   legível como massa chapada, e de volta pra baixo do destaque. */
-.sprite-unknown {
-  filter: brightness(0) invert(1);
-  opacity: 0.55;
-}
-
-/* Spawn ultra-raro cai no tier de destaque — aí a silhueta *é* o destaque e
-   pode usar a intensidade cheia sem inverter nada. */
-.sprite-unknown-highlight {
-  opacity: 1;
 }
 
 /* ==========================================================================

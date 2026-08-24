@@ -1,48 +1,60 @@
-import type { ServerStats } from "@/lib/queries/stats";
-import { LiveDot } from "@/components/LiveDot";
+"use client";
 
-const numberFormatter = new Intl.NumberFormat("pt-BR");
+import type { ServerStats } from "@/lib/queries/stats";
 
 /**
- * Faixa densa de uma linha no lugar do herói com quatro caixas de número.
- * Os contadores vivem em texto corrido monoespaçado — hierarquia por peso e
- * cor, não por quatro molduras iguais.
+ * A faixa de status. Substitui o herói + 4 stat tiles.
+ *
+ * Uma linha, densa, em mono. O número vem antes do rótulo porque o número é a
+ * informação e o rótulo é a legenda — na versão anterior os quatro tiles
+ * tinham o mesmo peso visual, então nenhum liderava. Só shinies leva cor, e a
+ * cor é a de raridade: é o único contador que fala de algo raro.
  */
 export function FeedStatusStrip({ stats, connected }: { stats: ServerStats; connected: boolean }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border pb-3">
-      <h1 className="text-sm font-semibold tracking-tight text-ink">Feed do servidor</h1>
+    <header className="flex flex-wrap items-baseline gap-x-4 gap-y-2 pb-1">
+      <h1 className="fd-pixel shrink-0" style={{ color: "var(--fd-ink)", fontSize: 11 }}>
+        Feed do servidor
+      </h1>
 
-      {connected ? (
-        <LiveDot />
-      ) : (
-        <span className="font-data text-[11px] text-ink-faint">conectando…</span>
-      )}
+      <span className="flex shrink-0 items-center gap-1.5">
+        <span
+          aria-hidden="true"
+          className="block h-1.5 w-1.5"
+          style={{
+            background: connected ? "var(--fd-note)" : "var(--fd-ink-3)",
+          }}
+        />
+        <span className="fd-pixel" style={{ color: connected ? "var(--fd-note)" : "var(--fd-ink-3)" }}>
+          {connected ? "Ao vivo" : "Conectando"}
+        </span>
+      </span>
 
-      <p className="flex flex-wrap items-center gap-x-2 font-data text-[11px] leading-5 text-ink-faint">
-        {/* ~ porque o total de eventos é contagem estimada — ver getServerStats. */}
-        <Stat value={`~${numberFormatter.format(stats.eventCount)}`} label="eventos" />
-        <Sep />
-        <Stat value={numberFormatter.format(stats.trainerCount)} label="treinadores" />
-        <Sep />
-        <Stat value={numberFormatter.format(stats.capturesToday)} label="capturas hoje" />
-        <Sep />
-        <Stat value={numberFormatter.format(stats.shinyCount)} label="shinies" tone="text-shiny" />
-        <Sep />
-        <Stat value={numberFormatter.format(stats.gymDefeats)} label="ginásios" />
-      </p>
+      <dl className="fd-mono flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[11px]">
+        <Stat value={`~${format(stats.eventCount)}`} label="eventos" />
+        <Stat value={format(stats.trainerCount)} label="treinadores" />
+        <Stat value={format(stats.capturesToday)} label="capturas hoje" />
+        <Stat value={format(stats.shinyCount)} label="shinies" tone="var(--fd-rare)" />
+        <Stat value={format(stats.gymDefeats)} label="ginásios" />
+      </dl>
+    </header>
+  );
+}
+
+function Stat({ value, label, tone }: { value: string; label: string; tone?: string }) {
+  return (
+    <div className="flex items-baseline gap-1.5">
+      <dt className="sr-only">{label}</dt>
+      <dd className="contents">
+        <span style={{ color: tone ?? "var(--fd-ink)", fontWeight: 600 }}>{value}</span>
+        <span aria-hidden="true" style={{ color: "var(--fd-ink-3)" }}>
+          {label}
+        </span>
+      </dd>
     </div>
   );
 }
 
-function Stat({ value, label, tone = "text-ink" }: { value: string; label: string; tone?: string }) {
-  return (
-    <span className="whitespace-nowrap">
-      <span className={`font-semibold ${tone}`}>{value}</span> {label}
-    </span>
-  );
-}
-
-function Sep() {
-  return <span aria-hidden className="text-border-strong">·</span>;
+function format(n: number): string {
+  return n.toLocaleString("pt-BR");
 }

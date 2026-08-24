@@ -1,20 +1,27 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Archivo, IBM_Plex_Mono, Silkscreen } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { SiteSectionNav } from "@/components/navigation/SiteSectionNav";
 
-const display = Space_Grotesk({
+const display = Archivo({
   variable: "--font-display",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
 
-const data = JetBrains_Mono({
+const data = IBM_Plex_Mono({
   variable: "--font-data",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+});
+
+// Bitmap de verdade. Só a 10px, em eyebrow / divisor de dia / chip.
+const pixel = Silkscreen({
+  variable: "--font-pixel",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -28,7 +35,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${display.variable} ${data.variable} h-full`}>
+    <html lang="pt-BR" className={`${display.variable} ${data.variable} ${pixel.variable} h-full`}>
       <body className="min-h-full antialiased">
         <ClerkProvider afterSignOutUrl="/feed">
           <div className="fixed left-6 top-1/2 z-30 hidden -translate-y-1/2 2xl:block">

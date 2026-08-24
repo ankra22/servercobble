@@ -127,7 +127,7 @@ export function LiveFeed({
     : typeFiltered;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="feed fd-grid flex flex-col gap-4 px-1">
       {stats && <FeedStatusStrip stats={stats} connected={connected} />}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -165,10 +165,10 @@ export function LiveFeed({
           type="button"
           onClick={loadMore}
           disabled={loadingMore}
-          className="mx-auto mt-2 flex items-center gap-2 rounded-full border border-border px-4 py-2 text-xs font-medium text-ink-dim transition-colors hover:border-border-strong hover:text-ink disabled:opacity-50"
+          className="fd-chip mx-auto mt-4 flex items-center gap-2 px-3 py-2 disabled:opacity-50"
         >
           {loadingMore && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-          Carregar mais eventos
+          <span className="fd-pixel">Carregar mais</span>
         </button>
       )}
     </div>

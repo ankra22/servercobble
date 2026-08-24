@@ -51,7 +51,7 @@ export const FEED_EVENT_ORDER: FeedEventType[] = [
 
 /* ==========================================================================
    Hierarquia visual — três pesos, pra um shiny não afundar no meio de uma
-   sequência de level ups. Ver FeedTimeline/FeedEventCard.
+   sequência de level ups. Ver FeedTimeline/FeedEventRow.
    ========================================================================== */
 
 export type FeedTier = "highlight" | "standard" | "ambient";
