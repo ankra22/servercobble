@@ -8,10 +8,17 @@ import { useRef, useEffect, useCallback, type ReactNode } from "react";
  * sem WebGL, um único listener de clique na div que envolve o conteúdo.
  * https://reactbits.dev/animations/click-spark
  *
- * Diferença do original: a div de fora não força `height: 100%` (só faz
- * sentido dentro de um container de altura fixa/explícita — aqui ela
- * envolve o `<body>` inteiro, então precisa crescer com o conteúdo, não
- * travar em 100% de um ancestral sem altura definida).
+ * Duas diferenças do original:
+ *
+ * 1. A div de fora não força `height: 100%` (só faz sentido dentro de um
+ *    container de altura fixa/explícita — aqui ela envolve o `<body>`
+ *    inteiro, então precisa crescer com o conteúdo, não travar em 100% de
+ *    um ancestral sem altura definida).
+ * 2. O loop de animação só roda enquanto tem faísca na tela. O original
+ *    chama requestAnimationFrame pra sempre, mesmo com sparksRef vazio —
+ *    como isso envolve o site inteiro, era um loop infinito rodando em
+ *    toda página o tempo todo, parado ou não (achado depois do usuário
+ *    reportar o site pesado).
  */
 
 type Easing = "linear" | "ease-in" | "ease-in-out" | "ease-out";
@@ -97,13 +104,21 @@ export function ClickSpark({
     [easing],
   );
 
-  useEffect(() => {
+  const animationIdRef = useRef<number | null>(null);
+
+  const stopLoop = useCallback(() => {
+    if (animationIdRef.current != null) {
+      cancelAnimationFrame(animationIdRef.current);
+      animationIdRef.current = null;
+    }
+  }, []);
+
+  const startLoop = useCallback(() => {
+    if (animationIdRef.current != null) return; // já rodando
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    let animationId: number;
 
     const draw = (timestamp: number) => {
       if (!startTimeRef.current) {
@@ -138,15 +153,20 @@ export function ClickSpark({
         return true;
       });
 
-      animationId = requestAnimationFrame(draw);
+      if (sparksRef.current.length > 0) {
+        animationIdRef.current = requestAnimationFrame(draw);
+      } else {
+        // Sem faísca sobrando — limpa o canvas uma última vez e para o loop
+        // em vez de continuar redesenhando um frame vazio pra sempre.
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        animationIdRef.current = null;
+      }
     };
 
-    animationId = requestAnimationFrame(draw);
+    animationIdRef.current = requestAnimationFrame(draw);
+  }, [sparkColor, sparkSize, sparkRadius, duration, easeFunc, extraScale]);
 
-    return () => {
-      cancelAnimationFrame(animationId);
-    };
-  }, [sparkColor, sparkSize, sparkRadius, sparkCount, duration, easeFunc, extraScale]);
+  useEffect(() => stopLoop, [stopLoop]);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const canvas = canvasRef.current;
@@ -164,6 +184,7 @@ export function ClickSpark({
     }));
 
     sparksRef.current.push(...newSparks);
+    startLoop();
   };
 
   return (
