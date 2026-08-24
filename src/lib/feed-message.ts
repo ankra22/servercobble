@@ -29,21 +29,3 @@ export function fallbackMessage(event: FeedEventWithTrainer): string {
       return `${trainer} teve uma novidade com ${species}.`;
   }
 }
-
-/**
- * Parte a mensagem na primeira ocorrência do nome da espécie, pra ela poder
- * viver na tipografia da frase em vez de numa pílula própria. Devolve null
- * quando não encontra — a frase então é renderizada inteira, sem ênfase.
- */
-export function splitOnSpecies(
-  message: string,
-  species: string | null,
-): [before: string, name: string, after: string] | null {
-  if (!species) return null;
-
-  const name = toTitleCase(species);
-  const at = message.toLowerCase().indexOf(name.toLowerCase());
-  if (at === -1) return null;
-
-  return [message.slice(0, at), message.slice(at, at + name.length), message.slice(at + name.length)];
-}

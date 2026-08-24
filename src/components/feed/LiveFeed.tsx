@@ -5,10 +5,8 @@ import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { FEED_SELECT } from "@/lib/queries/feed";
 import type { FeedEvent, FeedEventType, FeedEventWithTrainer, Trainer } from "@/lib/database.types";
-import type { ServerStats } from "@/lib/queries/stats";
-import { FeedTimeline } from "@/components/feed/FeedTimeline";
+import { FeedEventCard } from "@/components/feed/FeedEventCard";
 import { FeedFilters } from "@/components/feed/FeedFilters";
-import { FeedStatusStrip } from "@/components/feed/FeedStatusStrip";
 import { SpeciesFilter } from "@/components/feed/SpeciesFilter";
 import { LiveDot } from "@/components/LiveDot";
 
@@ -23,9 +21,6 @@ interface LiveFeedProps {
   emptyMessage?: string;
   /** Lista de espécies salvas do usuário logado (Clerk) — cada uma destaca o card em vermelho. */
   initialWatchedSpecies?: string[];
-  /** Quando presente, o feed abre com a faixa de status. Só a /feed passa —
-   *  o indicador ao vivo mora nela porque `connected` é estado daqui. */
-  stats?: ServerStats;
 }
 
 export function LiveFeed({
@@ -34,7 +29,6 @@ export function LiveFeed({
   showFilters = true,
   emptyMessage = "Nenhum evento por aqui ainda. Assim que algo acontecer no servidor, aparece automaticamente.",
   initialWatchedSpecies = [],
-  stats,
 }: LiveFeedProps) {
   const [events, setEvents] = useState(initialEvents);
   const [filter, setFilter] = useState<FeedEventType | "all">("all");
@@ -128,19 +122,15 @@ export function LiveFeed({
 
   return (
     <div className="flex flex-col gap-4">
-      {stats && <FeedStatusStrip stats={stats} connected={connected} />}
-
       <div className="flex flex-wrap items-center justify-between gap-3">
         {showFilters ? <FeedFilters active={filter} onChange={setFilter} /> : <span />}
-        {!stats && (
-          <span className="flex items-center gap-2">
-            {connected ? (
-              <LiveDot />
-            ) : (
-              <span className="rounded-full border border-border px-3 py-1 text-xs text-ink-faint">conectando…</span>
-            )}
-          </span>
-        )}
+        <span className="flex items-center gap-2">
+          {connected ? (
+            <LiveDot />
+          ) : (
+            <span className="rounded-full border border-border px-3 py-1 text-xs text-ink-faint">conectando…</span>
+          )}
+        </span>
       </div>
 
       {showFilters && (
@@ -153,11 +143,20 @@ export function LiveFeed({
       )}
 
       {visibleEvents.length === 0 ? (
-        <div className="rounded-md border border-dashed border-border p-10 text-center text-sm text-ink-faint">
+        <div className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-ink-faint">
           {emptyMessage}
         </div>
       ) : (
-        <FeedTimeline events={visibleEvents} newIds={newIds} watchedSpecies={watchedSpecies} />
+        <div className="flex flex-col gap-3">
+          {visibleEvents.map((event) => (
+            <FeedEventCard
+              key={event.id}
+              event={event}
+              isNew={newIds.has(event.id)}
+              isWatched={Boolean(event.species) && watchedSpecies.includes(event.species!.toLowerCase())}
+            />
+          ))}
+        </div>
       )}
 
       {hasMore && filter === "all" && (
