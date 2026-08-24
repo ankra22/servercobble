@@ -176,14 +176,14 @@
 }
 
 /* Escala calibrada por tier para o crescimento ABSOLUTO ficar parecido nos dois
-   (~+18px): 28 → 46px e 44 → 62px. Com a mesma escala nos dois, o destaque —
+   (~+28px): 28 → 56px e 44 → 73px. Com a mesma escala nos dois, o destaque —
    que já parte de 44px — dominaria a linha. */
 .fd-sprite--standard {
-  --fd-sprite-zoom: 1.65;
+  --fd-sprite-zoom: 2;
 }
 
 .fd-sprite--highlight {
-  --fd-sprite-zoom: 1.4;
+  --fd-sprite-zoom: 1.65;
 }
 
 /* --------------------------------------------------------------------------
