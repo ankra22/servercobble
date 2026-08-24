@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { SiteSectionNav } from "@/components/navigation/SiteSectionNav";
+import { ClickSpark } from "@/components/ClickSpark";
 
 const display = Archivo({
   variable: "--font-display",
@@ -38,10 +39,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="pt-BR" className={`${display.variable} ${pixel.variable} ${data.variable} h-full`}>
       <body className="min-h-full antialiased">
         <ClerkProvider afterSignOutUrl="/feed">
-          <div className="fixed left-6 top-1/2 z-30 hidden -translate-y-1/2 2xl:block">
-            <SiteSectionNav />
-          </div>
-          {children}
+          <ClickSpark sparkColor="#7bffb0" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
+            <div className="fixed left-6 top-1/2 z-30 hidden -translate-y-1/2 2xl:block">
+              <SiteSectionNav />
+            </div>
+            {children}
+          </ClickSpark>
         </ClerkProvider>
         <Analytics />
       </body>

@@ -137,14 +137,8 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: 19px;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(123 255 176 / 0.08), transparent),
-    linear-gradient(rgb(123 255 176 / 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(123 255 176 / 0.03) 1px, transparent 1px);
-  background-size:
-    100% 100%,
-    28px 28px,
-    28px 28px;
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgb(123 255 176 / 0.08), transparent);
+  background-size: 100% 100%;
   background-attachment: fixed;
   position: relative;
 }
@@ -235,14 +229,12 @@ body::after {
   scroll-snap-align: start;
   scroll-snap-stop: always;
   background-color: color-mix(in srgb, var(--color-bg) 74%, transparent);
-  background-image:
-    radial-gradient(ellipse 65% 55% at 50% 8%, color-mix(in srgb, var(--glow) 24%, transparent), transparent 70%),
-    linear-gradient(rgb(123 255 176 / 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(123 255 176 / 0.03) 1px, transparent 1px);
-  background-size:
-    100% 100%,
-    32px 32px,
-    32px 32px;
+  background-image: radial-gradient(
+    ellipse 65% 55% at 50% 8%,
+    color-mix(in srgb, var(--glow) 24%, transparent),
+    transparent 70%
+  );
+  background-size: 100% 100%;
 }
 
 .landing-hero-title {
