@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../components/feed/feed-theme.css";
 
 /* ==========================================================================
    Design tokens — "Terminal de Laboratório": tema fixo, escuro, verde-

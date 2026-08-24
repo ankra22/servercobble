@@ -1,43 +1,48 @@
-import { FEED_EVENT_CONFIG, FEED_EVENT_ORDER } from "@/lib/feed-events";
-import { TONE_CLASSES } from "@/lib/tone-classes";
-import type { FeedEventType } from "@/lib/database.types";
+"use client";
 
-interface FeedFiltersProps {
+import type { FeedEventType } from "@/lib/database.types";
+import { FEED_EVENT_CONFIG, FEED_EVENT_ORDER } from "@/lib/feed-events";
+
+/**
+ * Chips quadrados, aresta dura, sem pílula — a pílula arredondada era parte do
+ * vocabulário genérico. O ativo inverte (tinta vira fundo) em vez de ganhar
+ * uma cor de marca: assim nenhum filtro compete com o ouro, que no feed
+ * significa raridade.
+ */
+export function FeedFilters({
+  active,
+  onChange,
+}: {
   active: FeedEventType | "all";
   onChange: (value: FeedEventType | "all") => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1" role="group" aria-label="Filtrar por tipo de evento">
+      <Chip label="Tudo" pressed={active === "all"} onClick={() => onChange("all")} />
+      {FEED_EVENT_ORDER.map((type) => (
+        <Chip
+          key={type}
+          label={FEED_EVENT_CONFIG[type].label}
+          pressed={active === type}
+          onClick={() => onChange(type)}
+        />
+      ))}
+    </div>
+  );
 }
 
-export function FeedFilters({ active, onChange }: FeedFiltersProps) {
+function Chip({
+  label,
+  pressed,
+  onClick,
+}: {
+  label: string;
+  pressed: boolean;
+  onClick: () => void;
+}) {
   return (
-    <div className="flex flex-wrap gap-2">
-      <button
-        type="button"
-        onClick={() => onChange("all")}
-        className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-          active === "all"
-            ? "border-brand/30 bg-brand-dim/40 text-brand"
-            : "border-border text-ink-dim hover:border-border-strong hover:text-ink"
-        }`}
-      >
-        Tudo
-      </button>
-      {FEED_EVENT_ORDER.map((type) => {
-        const config = FEED_EVENT_CONFIG[type];
-        const tone = TONE_CLASSES[config.tone];
-        const isActive = active === type;
-        return (
-          <button
-            key={type}
-            type="button"
-            onClick={() => onChange(type)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-              isActive ? `${tone.softBorder} ${tone.softBg} ${tone.text}` : "border-border text-ink-dim hover:border-border-strong hover:text-ink"
-            }`}
-          >
-            {config.label}
-          </button>
-        );
-      })}
-    </div>
+    <button type="button" aria-pressed={pressed} onClick={onClick} className="fd-chip px-2.5 py-1.5">
+      <span className="fd-pixel">{label}</span>
+    </button>
   );
 }

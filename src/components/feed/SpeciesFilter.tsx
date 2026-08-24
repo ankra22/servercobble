@@ -17,7 +17,7 @@ interface SpeciesFilterProps {
 /**
  * Busca por espécie (filtra o que já está carregado no feed) + gerenciamento
  * da lista de espécies que o usuário logado quer acompanhar (destacadas em
- * vermelho no feed — ver FeedEventCard).
+ * vermelho no feed — ver FeedEventRow).
  */
 export function SpeciesFilter({ value, onChange, watchedSpecies, onWatchedSpeciesChange }: SpeciesFilterProps) {
   const { isSignedIn } = useUser();
