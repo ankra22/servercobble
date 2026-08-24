@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { getPokedexEntry, POKEDEX, RARITY_LABELS, TYPE_LABELS } from "@/lib/pokedex";
 import { PokemonSprite } from "@/components/PokemonSprite";
 import { ChevronMark } from "@/components/icons/Chevron";
-import { Cubes } from "@/components/dex/Cubes";
 
 interface PageProps {
   params: Promise<{ number: string }>;
@@ -40,23 +39,8 @@ export default async function DexEntryPage({ params }: PageProps) {
 
       <div className="rounded-3xl border border-border bg-panel/60 p-6 sm:p-8">
         <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
-          <span className="relative flex h-36 w-36 shrink-0 items-center justify-center">
-            <span className="absolute inset-2 opacity-70">
-              <Cubes
-                gridSize={5}
-                maxAngle={55}
-                radius={2.5}
-                borderStyle="1px solid #2c4d38"
-                faceColor="#0c130f"
-                rippleColor="#ffe066"
-                rippleSpeed={1.4}
-                autoAnimate
-                rippleOnClick
-              />
-            </span>
-            <span className="relative z-10 flex h-20 w-20 items-center justify-center rounded-2xl bg-bg-elevated/90 backdrop-blur-sm">
-              <PokemonSprite species={entry.id} variant="animated" size={80} />
-            </span>
+          <span className="flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl bg-bg-elevated">
+            <PokemonSprite species={entry.id} variant="animated" size={96} />
           </span>
 
           <div>

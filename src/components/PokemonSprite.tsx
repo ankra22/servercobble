@@ -34,7 +34,7 @@ export function PokemonSprite({ species, isShiny = false, variant = "icon", size
       height={size}
       unoptimized
       className={`pixelated object-contain ${className}`}
-      style={{ width: size, height: "auto" }}
+      style={{ width: size, height: size }}
       onError={() => setErrored(true)}
     />
   );

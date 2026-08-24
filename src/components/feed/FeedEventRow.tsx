@@ -41,7 +41,7 @@ export function FeedEventRow({ event, tier, watched }: FeedEventRowProps) {
           className="flex shrink-0 items-center justify-center"
           style={{
             width: spriteSize,
-            height: 20,
+            height: spriteSize,
             marginTop: tier === "highlight" ? 2 : 0,
           }}
         >
