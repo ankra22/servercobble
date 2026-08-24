@@ -13,7 +13,7 @@ import type { ServerStats } from "@/lib/queries/stats";
 export function FeedStatusStrip({ stats, connected }: { stats: ServerStats; connected: boolean }) {
   return (
     <header className="flex flex-wrap items-baseline gap-x-4 gap-y-2 pb-1">
-      <h1 className="fd-pixel shrink-0" style={{ color: "var(--fd-ink)", fontSize: 11 }}>
+      <h1 className="fd-pixel shrink-0" style={{ color: "var(--fd-ink)" }}>
         Feed do servidor
       </h1>
 
