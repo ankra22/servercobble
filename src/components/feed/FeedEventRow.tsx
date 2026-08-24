@@ -38,7 +38,7 @@ export function FeedEventRow({ event, tier, watched }: FeedEventRowProps) {
     <div className="flex min-w-0 gap-3">
       {spriteSize > 0 && event.species && (
         <span
-          className="flex shrink-0 items-center justify-center"
+          className={`fd-sprite fd-sprite--${tier} flex shrink-0 items-center justify-center`}
           style={{
             width: spriteSize,
             height: 20,
