@@ -5,8 +5,10 @@ import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { FEED_SELECT } from "@/lib/queries/feed";
 import type { FeedEvent, FeedEventType, FeedEventWithTrainer, Trainer } from "@/lib/database.types";
-import { FeedEventCard } from "@/components/feed/FeedEventCard";
+import type { ServerStats } from "@/lib/queries/stats";
+import { FeedTimeline } from "@/components/feed/FeedTimeline";
 import { FeedFilters } from "@/components/feed/FeedFilters";
+import { FeedStatusStrip } from "@/components/feed/FeedStatusStrip";
 import { SpeciesFilter } from "@/components/feed/SpeciesFilter";
 import { LiveDot } from "@/components/LiveDot";
 
@@ -21,6 +23,9 @@ interface LiveFeedProps {
   emptyMessage?: string;
   /** Lista de espécies salvas do usuário logado (Clerk) — cada uma destaca o card em vermelho. */
   initialWatchedSpecies?: string[];
+  /** Quando presente, o feed abre com a faixa de status. Só a /feed passa —
+   *  o indicador ao vivo mora nela porque `connected` é estado daqui. */
+  stats?: ServerStats;
 }
 
 export function LiveFeed({
@@ -29,6 +34,7 @@ export function LiveFeed({
   showFilters = true,
   emptyMessage = "Nenhum evento por aqui ainda. Assim que algo acontecer no servidor, aparece automaticamente.",
   initialWatchedSpecies = [],
+  stats,
 }: LiveFeedProps) {
   const [events, setEvents] = useState(initialEvents);
   const [filter, setFilter] = useState<FeedEventType | "all">("all");
@@ -121,16 +127,20 @@ export function LiveFeed({
     : typeFiltered;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="feed fd-grid flex flex-col gap-4 px-1">
+      {stats && <FeedStatusStrip stats={stats} connected={connected} />}
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         {showFilters ? <FeedFilters active={filter} onChange={setFilter} /> : <span />}
-        <span className="flex items-center gap-2">
-          {connected ? (
-            <LiveDot />
-          ) : (
-            <span className="rounded-full border border-border px-3 py-1 text-xs text-ink-faint">conectando…</span>
-          )}
-        </span>
+        {!stats && (
+          <span className="flex items-center gap-2">
+            {connected ? (
+              <LiveDot />
+            ) : (
+              <span className="rounded-full border border-border px-3 py-1 text-xs text-ink-faint">conectando…</span>
+            )}
+          </span>
+        )}
       </div>
 
       {showFilters && (
@@ -143,20 +153,11 @@ export function LiveFeed({
       )}
 
       {visibleEvents.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-ink-faint">
+        <div className="rounded-md border border-dashed border-border p-10 text-center text-sm text-ink-faint">
           {emptyMessage}
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
-          {visibleEvents.map((event) => (
-            <FeedEventCard
-              key={event.id}
-              event={event}
-              isNew={newIds.has(event.id)}
-              isWatched={Boolean(event.species) && watchedSpecies.includes(event.species!.toLowerCase())}
-            />
-          ))}
-        </div>
+        <FeedTimeline events={visibleEvents} newIds={newIds} watchedSpecies={watchedSpecies} />
       )}
 
       {hasMore && filter === "all" && (
@@ -164,10 +165,10 @@ export function LiveFeed({
           type="button"
           onClick={loadMore}
           disabled={loadingMore}
-          className="mx-auto mt-2 flex items-center gap-2 rounded-full border border-border px-4 py-2 text-xs font-medium text-ink-dim transition-colors hover:border-border-strong hover:text-ink disabled:opacity-50"
+          className="fd-chip mx-auto mt-4 flex items-center gap-2 px-3 py-2 disabled:opacity-50"
         >
           {loadingMore && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-          Carregar mais eventos
+          <span className="fd-pixel">Carregar mais</span>
         </button>
       )}
     </div>
