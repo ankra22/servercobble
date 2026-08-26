@@ -85,51 +85,69 @@ export function KantoDiorama() {
     renderer.setPixelRatio(dpr);
     renderer.setSize(holder.clientWidth, holder.clientHeight, false);
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1;
+    renderer.toneMappingExposure = 0.98;
     renderer.setClearColor(0x8ec7ea);
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x9ecde8, 70, 220);
+    scene.fog = new THREE.Fog(0xa9d3ea, 90, 240);
 
     const camera = new THREE.PerspectiveCamera(
       48,
       holder.clientWidth / holder.clientHeight,
       0.1,
-      600,
+      800,
     );
 
-    const hemi = new THREE.HemisphereLight(0xbfe0ff, 0x5a6a44, 1.5);
+    // Céu em gradiente (cúpula, custo desprezível).
+    const skyGeo = new THREE.SphereGeometry(360, 24, 16);
+    const skyCanvas = document.createElement("canvas");
+    skyCanvas.width = 4;
+    skyCanvas.height = 128;
+    const skyCtx = skyCanvas.getContext("2d")!;
+    const grad = skyCtx.createLinearGradient(0, 0, 0, 128);
+    grad.addColorStop(0, "#4f9fd6");
+    grad.addColorStop(0.55, "#8ec7ea");
+    grad.addColorStop(1, "#cfe6f2");
+    skyCtx.fillStyle = grad;
+    skyCtx.fillRect(0, 0, 4, 128);
+    const skyTex = new THREE.CanvasTexture(skyCanvas);
+    skyTex.colorSpace = THREE.SRGBColorSpace;
+    const sky = new THREE.Mesh(
+      skyGeo,
+      new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide, fog: false, depthWrite: false }),
+    );
+    scene.add(sky);
+
+    const hemi = new THREE.HemisphereLight(0xcfe4f4, 0x6b6a44, 1.15);
     scene.add(hemi);
 
-    const sun = new THREE.DirectionalLight(0xfff1d6, 2.5);
-    sun.position.set(24, 46, -26);
+    const sun = new THREE.DirectionalLight(0xfff0d2, 2.9);
+    sun.position.set(-30, 40, -28);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
     sun.shadow.camera.near = 1;
-    sun.shadow.camera.far = 170;
-    const d = 54;
+    sun.shadow.camera.far = 180;
+    const d = 56;
     sun.shadow.camera.left = -d;
     sun.shadow.camera.right = d;
     sun.shadow.camera.top = d;
     sun.shadow.camera.bottom = -d;
-    sun.shadow.bias = -0.0004;
-    sun.target.position.set(0, 4, 10);
+    sun.shadow.bias = -0.00035;
+    sun.shadow.normalBias = 0.02;
+    sun.target.position.set(2, 4, 10);
     scene.add(sun, sun.target);
 
     for (const lx of [-4, 4]) {
-      const lamp = new THREE.PointLight(0xffcf95, 16, 22, 1.8);
+      const lamp = new THREE.PointLight(0xffc98a, 12, 16, 2);
       lamp.position.set(lx, 5, 2);
       scene.add(lamp);
     }
 
     const diorama = createKantoDiorama();
     scene.add(diorama.group);
-    setStats({
-      blocks: diorama.stats.solid + diorama.stats.glass + diorama.stats.clouds,
-      dpr,
-    });
+    setStats({ blocks: diorama.stats.blocks, dpr });
 
     // ---- render sob demanda ----------------------------------------------
     const cam = { ...BEATS[0] };
@@ -276,6 +294,9 @@ export function KantoDiorama() {
       if (rafId) cancelAnimationFrame(rafId);
       diorama.dispose();
       scene.remove(diorama.group);
+      skyGeo.dispose();
+      skyTex.dispose();
+      (sky.material as THREE.Material).dispose();
       renderer.dispose();
     };
   }, []);
@@ -298,9 +319,9 @@ export function KantoDiorama() {
             ref={(el) => {
               panelRefs.current[i] = el;
             }}
-            className="pointer-events-none absolute inset-x-0 bottom-[8vh] flex justify-center px-6 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:justify-start sm:px-[8vw]"
+            className="pointer-events-none absolute inset-x-0 bottom-[7vh] flex justify-center px-5 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:justify-start sm:px-[7vw]"
           >
-            <div className="max-w-md rounded-2xl bg-black/55 p-6 text-white backdrop-blur-sm sm:p-8">
+            <div className="max-w-sm rounded-2xl bg-black/72 p-6 text-white ring-1 ring-white/10 sm:p-7">
               <p className="font-pixel text-[10px] tracking-[0.14em] text-[#7bffb0]">
                 {panel.eyebrow}
               </p>
