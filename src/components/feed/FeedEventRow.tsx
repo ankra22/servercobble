@@ -10,6 +10,8 @@ interface FeedEventRowProps {
   event: FeedEventWithTrainer;
   tier: FeedTier;
   watched: boolean;
+  /** Lendário/mítico apareceu no server — card em "modo alerta" (vermelho). */
+  alert?: boolean;
 }
 
 /**
@@ -26,7 +28,7 @@ interface FeedEventRowProps {
  *    1px do trilho. Cabe ~3x mais evento na mesma tela, que é o que um log de
  *    servidor pede.
  */
-export function FeedEventRow({ event, tier, watched }: FeedEventRowProps) {
+export function FeedEventRow({ event, tier, watched, alert = false }: FeedEventRowProps) {
   const config = FEED_EVENT_CONFIG[event.type];
   const coords = formatCoordinates(event.coordinates);
   const message = event.message?.trim() || fallbackMessage(event);
@@ -59,9 +61,18 @@ export function FeedEventRow({ event, tier, watched }: FeedEventRowProps) {
             própria frase já dizem o tipo — repetir seria acessório. */}
         {tier === "highlight" && (
           <p className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="fd-pixel" style={{ color: "var(--fd-rare)" }}>
-              {config.label}
-            </span>
+            {alert ? (
+              <span
+                className="fd-pixel px-1 py-0.5"
+                style={{ color: "var(--fd-bg)", background: "var(--fd-alert)" }}
+              >
+                ! Lendário
+              </span>
+            ) : (
+              <span className="fd-pixel" style={{ color: "var(--fd-rare)" }}>
+                {config.label}
+              </span>
+            )}
             {event.is_shiny && (
               <span
                 className="fd-pixel px-1 py-0.5"
@@ -70,7 +81,7 @@ export function FeedEventRow({ event, tier, watched }: FeedEventRowProps) {
                 Shiny
               </span>
             )}
-            {event.type === "rare_spawn" && event.rarity === "ultra-rare" && (
+            {!alert && event.type === "rare_spawn" && event.rarity === "ultra-rare" && (
               <span className="fd-pixel" style={{ color: "var(--fd-ink-3)" }}>
                 Ultra-raro
               </span>
@@ -89,7 +100,7 @@ export function FeedEventRow({ event, tier, watched }: FeedEventRowProps) {
         <Message
           text={message}
           species={event.species}
-          emphasis={tier === "highlight" ? "var(--fd-ink)" : "var(--fd-ink)"}
+          emphasis={alert ? "var(--fd-alert)" : "var(--fd-ink)"}
           className={
             tier === "highlight"
               ? "text-[15px] leading-5"

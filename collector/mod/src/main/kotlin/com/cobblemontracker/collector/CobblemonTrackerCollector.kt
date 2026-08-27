@@ -68,11 +68,42 @@ object CobblemonTrackerCollector : ModInitializer {
         CobblemonEvents.POKEMON_ENTITY_SPAWN.subscribe(Priority.NORMAL) { event ->
             val pokemon = event.entity.pokemon
             val rarity = RarityRegistry.bucketFor(pokemon.species.showdownId())
-            if (rarity == "rare" || rarity == "ultra-rare") {
-                TrackerEventWriter.submit(EventFactory.rareSpawn(pokemon, event.entity, rarity))
+            // Lendário/mítico entra no feed SEMPRE, mesmo sem bucket de raridade
+            // no spawn pool (monumento lendário, spawn forçado, etc.) — o site
+            // trata esse card como "alerta" (vermelho).
+            val legendary = pokemon.species.labels.any { it == "legendary" || it == "mythical" }
+            if (rarity == "rare" || rarity == "ultra-rare" || legendary) {
+                TrackerEventWriter.submit(
+                    EventFactory.rareSpawn(pokemon, event.entity, rarity ?: "ultra-rare"),
+                )
             }
             if (pokemon.shiny) {
                 TrackerEventWriter.submit(EventFactory.wildShinyFound(pokemon, event.entity))
+            }
+        }
+
+        // Breeding — eventos NATIVOS do Cobblemon (não do Cobbreeding). Por
+        // enquanto logam pra confirmar se o Cobbreeding dispara eles; se
+        // dispararem, o ingestor já monta o card no feed.
+        CobblemonEvents.COLLECT_EGG.subscribe(Priority.NORMAL) { event ->
+            logger.info(
+                "COLLECT_EGG: pai=${event.maleParent.species.showdownId()} " +
+                    "mae=${event.femaleParent.species.showdownId()} " +
+                    "ovo=${event.egg.species} jogador=${event.player.gameProfile.name}",
+            )
+            TrackerEventWriter.submit(
+                EventFactory.eggCollected(event.maleParent, event.femaleParent, event.egg, event.player),
+            )
+        }
+
+        CobblemonEvents.HATCH_EGG_POST.subscribe(Priority.NORMAL) { event ->
+            val owner: ServerPlayer? = event.player
+            logger.info(
+                "HATCH_EGG_POST: ${event.pokemon.species.showdownId()} " +
+                    "shiny=${event.pokemon.shiny} jogador=${owner?.gameProfile?.name}",
+            )
+            if (owner != null) {
+                TrackerEventWriter.submit(EventFactory.eggHatched(event.pokemon, owner))
             }
         }
 

@@ -28,6 +28,7 @@
   --fd-rare: #b9791a; /* raro — ouro de placa de rota, escurecido pra segurar contraste no LCD */
   --fd-rare-soft: rgb(242 193 46 / 0.16);
   --fd-watch: #cc3f28; /* espécie observada pelo usuário (vermelho de PokéBola) */
+  --fd-alert: #d21f2b; /* lendário/mítico apareceu no server — "modo alerta" */
 
   color: var(--fd-ink);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
@@ -114,6 +115,35 @@
     0 0 0 4px rgb(204 63 40 / 0.32);
 }
 
+/* Alerta de lendário — sobrepõe qualquer tier: nó vermelho maior com halo. */
+.fd-node--alert {
+  width: 11px;
+  height: 11px;
+  background: var(--fd-alert);
+  box-shadow:
+    0 0 0 3px var(--fd-bg),
+    0 0 0 5px rgb(210 31 43 / 0.35);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fd-node--alert {
+    animation: fd-alert-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes fd-alert-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 0 3px var(--fd-bg),
+        0 0 0 5px rgb(210 31 43 / 0.35);
+    }
+    50% {
+      box-shadow:
+        0 0 0 3px var(--fd-bg),
+        0 0 0 7px rgb(210 31 43 / 0.12);
+    }
+  }
+}
+
 /* Trilho: fio de 1px atrás da coluna dos nós. */
 .fd-rail {
   background: var(--fd-line);
@@ -145,6 +175,12 @@
 .fd-row--watch {
   background: linear-gradient(90deg, rgb(204 63 40 / 0.14), rgb(204 63 40 / 0) 55%);
   box-shadow: inset 2px 0 0 var(--fd-watch);
+}
+
+/* Alerta de lendário: barra grossa + lavagem vermelha que vai mais longe. */
+.fd-row--alert {
+  background: linear-gradient(90deg, rgb(210 31 43 / 0.26), rgb(210 31 43 / 0) 70%);
+  box-shadow: inset 3px 0 0 var(--fd-alert);
 }
 
 /* --------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { FeedEventWithTrainer } from "@/lib/database.types";
-import { feedTier, type FeedTier } from "@/lib/feed-events";
+import { feedTier, isLegendaryAlert, type FeedTier } from "@/lib/feed-events";
 import { groupFeedEvents, type FeedRow } from "@/lib/feed-grouping";
 import { dayKey, formatClock, formatDayLabel } from "@/lib/format";
 import { FeedEventRow } from "@/components/feed/FeedEventRow";
@@ -133,10 +133,17 @@ function TimelineRow({
   const { event } = row;
   const watched = isWatched(event.species);
   const tier = feedTier(event, watched);
+  const alert = isLegendaryAlert(event);
 
   return (
-    <RowShell iso={event.created_at} tier={tier} watched={watched} isNew={newIds.has(event.id)}>
-      <FeedEventRow event={event} tier={tier} watched={watched} />
+    <RowShell
+      iso={event.created_at}
+      tier={tier}
+      watched={watched}
+      alert={alert}
+      isNew={newIds.has(event.id)}
+    >
+      <FeedEventRow event={event} tier={tier} watched={watched} alert={alert} />
     </RowShell>
   );
 }
@@ -149,6 +156,7 @@ function RowShell({
   iso,
   tier,
   watched,
+  alert = false,
   isNew = false,
   hit = false,
   nested = false,
@@ -157,13 +165,15 @@ function RowShell({
   iso: string;
   tier: FeedTier;
   watched: boolean;
+  alert?: boolean;
   isNew?: boolean;
   hit?: boolean;
   nested?: boolean;
   children: React.ReactNode;
 }) {
-  const rowTone =
-    tier === "highlight" && watched
+  const rowTone = alert
+    ? "fd-row--alert"
+    : tier === "highlight" && watched
       ? "fd-row--watch"
       : tier === "highlight"
         ? "fd-row--highlight"
@@ -200,6 +210,7 @@ function RowShell({
           className={[
             "fd-node",
             `fd-node--${tier}`,
+            alert ? "fd-node--alert" : "",
             watched ? "fd-node--watch" : "",
             nested ? "opacity-60" : "",
           ]

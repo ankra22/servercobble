@@ -217,6 +217,61 @@ def process_rare_spawn(event: dict[str, Any]) -> None:
     })
 
 
+def process_breeding(event: dict[str, Any]) -> None:
+    """Breeding nativo do Cobblemon (ver COLLECT_EGG / HATCH_EGG_POST no mod).
+
+    stage="egg":   um ovo foi gerado — card com os pais, sem mexer em `pokemons`
+                   (o ovo ainda não é um Pokémon).
+    stage="hatch": o ovo chocou — Pokémon novo, entra em `pokemons` como uma
+                   captura e vira card no feed.
+    """
+    username = event["trainer"]["username"]
+    trainer_id = upsert_trainer(username)
+    stage = event.get("stage")
+
+    if stage == "hatch":
+        pokemon = event["pokemon"]
+        upsert_pokemon(trainer_id, pokemon)
+        species_label = title_case(pokemon["species"])
+        shiny = bool(pokemon.get("is_shiny"))
+        message = (
+            f"{username} chocou um {species_label} shiny!"
+            if shiny
+            else f"{username} chocou um {species_label}."
+        )
+        insert_feed_event({
+            "type": "breeding",
+            "trainer_id": trainer_id,
+            "species": pokemon["species"],
+            "is_shiny": shiny,
+            "coordinates": event.get("coordinates"),
+            "message": message,
+            "source_event_id": event["source_event_id"],
+        })
+        return
+
+    # stage == "egg"
+    male = event.get("male_parent")
+    female = event.get("female_parent")
+    egg_species = event.get("egg_species")
+    parents = " × ".join(title_case(p) for p in (female, male) if p)
+    if egg_species:
+        message = f"{username} conseguiu um ovo de {title_case(egg_species)} ({parents})."
+    elif parents:
+        message = f"{username} conseguiu um ovo ({parents})."
+    else:
+        message = f"{username} conseguiu um ovo."
+    insert_feed_event({
+        "type": "breeding",
+        "trainer_id": trainer_id,
+        "species": egg_species,  # pode ser None (ovo "misterioso")
+        "is_shiny": bool(event.get("is_shiny")),
+        "coordinates": event.get("coordinates"),
+        "message": message,
+        "source_event_id": event["source_event_id"],
+    })
+
+
 GYM_RANK_MESSAGE = {
     "gym": "{username} derrotou o líder {name}.",
     "elite_four": "{username} derrotou o membro da Elite Four {name}.",
@@ -300,6 +355,7 @@ HANDLERS = {
     "evolution": process_evolution,
     "level_up": process_level_up,
     "rare_spawn": process_rare_spawn,
+    "breeding": process_breeding,
     "gym_defeat": process_gym_defeat,
     "region_snapshot": process_region_snapshot,
     "team_snapshot": process_team_snapshot,

@@ -1,6 +1,7 @@
 package com.cobblemontracker.collector
 
 import com.cobblemon.mod.common.Cobblemon
+import com.cobblemon.mod.common.api.pokemon.PokemonProperties
 import com.cobblemon.mod.common.api.pokemon.stats.Stats
 import com.cobblemon.mod.common.pokemon.Pokemon
 import com.google.gson.JsonArray
@@ -119,6 +120,34 @@ object EventFactory {
         json.add("pokemon", wildPokemonJson(pokemon))
         json.add("coordinates", coordinatesJson(entity))
         json.addProperty("rarity", rarity)
+        return json
+    }
+
+    /** Ovo gerado no breeding (Cobblemon nativo). `stage = "egg"`. */
+    fun eggCollected(
+        maleParent: Pokemon,
+        femaleParent: Pokemon,
+        egg: PokemonProperties,
+        player: ServerPlayer,
+    ): JsonObject {
+        val json = base("breeding")
+        json.addProperty("stage", "egg")
+        json.add("trainer", trainerJson(player))
+        json.addProperty("male_parent", maleParent.species.showdownId())
+        json.addProperty("female_parent", femaleParent.species.showdownId())
+        json.addProperty("egg_species", egg.species) // pode vir null (ovo "misterioso")
+        json.addProperty("is_shiny", egg.shiny ?: false)
+        json.add("coordinates", coordinatesJson(player))
+        return json
+    }
+
+    /** Ovo chocou — Pokémon novo no time do jogador. `stage = "hatch"`. */
+    fun eggHatched(pokemon: Pokemon, player: ServerPlayer): JsonObject {
+        val json = base("breeding")
+        json.addProperty("stage", "hatch")
+        json.add("trainer", trainerJson(player))
+        json.add("pokemon", pokemonJson(pokemon, player))
+        json.add("coordinates", coordinatesJson(player))
         return json
     }
 

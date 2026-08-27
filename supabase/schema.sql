@@ -81,7 +81,8 @@ create table if not exists public.feed_events (
                       'gym_defeat',
                       'evolution',
                       'level_up',
-                      'shiny_found'
+                      'shiny_found',
+                      'breeding'
                     )
                   ),
   trainer_id      uuid references public.trainers (id) on delete cascade,
@@ -103,6 +104,14 @@ alter table public.feed_events add column if not exists source_event_id uuid uni
 alter table public.feed_events add column if not exists rarity text check (rarity in ('rare', 'ultra-rare'));
 alter table public.feed_events add column if not exists series text;
 alter table public.feed_events add column if not exists rank text check (rank in ('gym', 'elite_four', 'champion'));
+
+-- 'breeding' entrou depois (ovo gerado / ovo chocado). Recria o check do
+-- `type` pra bancos já provisionados — o `create table` acima só vale na
+-- primeira vez.
+alter table public.feed_events drop constraint if exists feed_events_type_check;
+alter table public.feed_events add constraint feed_events_type_check check (
+  type in ('rare_spawn', 'capture', 'gym_defeat', 'evolution', 'level_up', 'shiny_found', 'breeding')
+);
 
 comment on table public.feed_events is 'Linha do tempo de eventos capturados dos logs do servidor, exibida no feed ao vivo.';
 comment on column public.feed_events.rarity is 'Só preenchido em eventos "rare_spawn": raridade do bucket de spawn do Cobblemon ("rare" ou "ultra-rare"). O feed principal só mostra ultra-rare; a aba "Spawns raros" mostra os dois.';

@@ -25,6 +25,10 @@ export function fallbackMessage(event: FeedEventWithTrainer): string {
       return `${species} de ${trainer} subiu de nível.`;
     case "shiny_found":
       return `${trainer} encontrou um ${species} shiny!`;
+    case "breeding":
+      return event.species
+        ? `${trainer} chocou um ${species}.`
+        : `${trainer} conseguiu um ovo.`;
     default:
       return `${trainer} teve uma novidade com ${species}.`;
   }
