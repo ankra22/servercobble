@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { href: "/regras", label: "Regras" },
   { href: "/feed", label: "Feed" },
   { href: "/dex", label: "Dex" },
+  { href: "/itens", label: "Itens" },
   { href: "/regioes", label: "Regiões" },
   { href: "/trainers", label: "Treinadores" },
 ];

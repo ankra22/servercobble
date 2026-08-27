@@ -8,6 +8,7 @@ const SECTIONS = [
   { label: "Regras", href: "/regras" },
   { label: "Feed", href: "/feed" },
   { label: "Dex", href: "/dex" },
+  { label: "Itens", href: "/itens" },
   { label: "Regiões", href: "/regioes" },
   { label: "Treinadores", href: "/trainers" },
 ] as const;
@@ -16,8 +17,9 @@ function activeIndexFor(pathname: string): number | null {
   if (pathname.startsWith("/regras")) return 1;
   if (pathname.startsWith("/feed")) return 2;
   if (pathname.startsWith("/dex")) return 3;
-  if (pathname.startsWith("/regioes")) return 4;
-  if (pathname.startsWith("/trainers")) return 5;
+  if (pathname.startsWith("/itens")) return 4;
+  if (pathname.startsWith("/regioes")) return 5;
+  if (pathname.startsWith("/trainers")) return 6;
   if (pathname === "/") return 0;
   return null;
 }

@@ -18,7 +18,43 @@ export interface PokedexEntry {
    * = spawna a qualquer hora / com qualquer clima.
    */
   spawnConditions: string[];
+  /** Stats base + total. `null` só se o arquivo da espécie não tiver `baseStats`. */
+  baseStats: BaseStats | null;
+  evolution: EvolutionChain;
 }
+
+export interface BaseStats {
+  hp: number;
+  atk: number;
+  def: number;
+  spa: number;
+  spd: number;
+  spe: number;
+  total: number;
+}
+
+export interface EvolutionStep {
+  /** Número nacional do Pokémon resultante. */
+  number: number;
+  /** Método em pt-BR: "Nível 16", "Pedra do Trovão", "Amizade alta, à noite"… */
+  method: string;
+}
+
+export interface EvolutionChain {
+  /** Número da pré-evolução, ou `null` se é o início da linha. */
+  from: number | null;
+  /** Evoluções diretas (pode ramificar, ex.: Eevee). */
+  to: EvolutionStep[];
+}
+
+export const STAT_LABELS: Array<{ key: keyof Omit<BaseStats, "total">; label: string }> = [
+  { key: "hp", label: "PV" },
+  { key: "atk", label: "Ataque" },
+  { key: "def", label: "Defesa" },
+  { key: "spa", label: "Atq. Esp." },
+  { key: "spd", label: "Def. Esp." },
+  { key: "spe", label: "Velocidade" },
+];
 
 export const POKEDEX: PokedexEntry[] = pokedexData as PokedexEntry[];
 

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPokedexEntry, isLocationHidden, POKEDEX, TYPE_LABELS } from "@/lib/pokedex";
 import { PokemonSprite } from "@/components/PokemonSprite";
+import { PokemonStats } from "@/components/pokedex/PokemonStats";
+import { EvolutionLine } from "@/components/pokedex/EvolutionLine";
 import { ChevronMark } from "@/components/icons/Chevron";
 
 interface PageProps {
@@ -114,6 +116,14 @@ export default async function DexEntryPage({ params }: PageProps) {
               </div>
             )}
           </div>
+
+          {entry.baseStats && (
+            <div className="mt-6 border-t border-lcd-edge/25 pt-5">
+              <PokemonStats stats={entry.baseStats} />
+            </div>
+          )}
+
+          <EvolutionLine entry={entry} />
         </div>
       </div>
     </div>

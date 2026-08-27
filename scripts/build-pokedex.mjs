@@ -71,6 +71,89 @@ const HIDDEN_LOCATION_LABELS = new Set(["legendary", "mythical", "ultra_beast"])
 // spawnConditions() abaixo) — aí é uma regra de verdade, não uma variação.
 const TIME_LABELS = { day: "Dia", night: "Noite", dawn: "Amanhecer", dusk: "Entardecer" };
 
+const TYPE_PT = {
+  normal: "Normal", fire: "Fogo", water: "Água", grass: "Planta", electric: "Elétrico",
+  ice: "Gelo", fighting: "Lutador", poison: "Veneno", ground: "Terra", flying: "Voador",
+  psychic: "Psíquico", bug: "Inseto", rock: "Pedra", ghost: "Fantasma", dragon: "Dragão",
+  dark: "Sombrio", steel: "Aço", fairy: "Fada",
+};
+
+// Nome pt-BR de um item ("cobblemon:thunder_stone" -> "Pedra do Trovão").
+// Cai pro id formatado quando não há tradução (itens minecraft:).
+function itemName(itemId) {
+  if (!itemId) return null;
+  const bare = String(itemId).split(" ")[0].replace(/^#/, "");
+  return (
+    lang[`item.${bare.replace(":", ".")}`] ??
+    bare
+      .replace(/^[a-z_]+:/, "")
+      .replaceAll("_", " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+  );
+}
+
+// Texto curto do método de evolução, em pt-BR ("Nível 16", "Pedra do Trovão",
+// "Troca segurando Revestimento Metálico", "Amizade alta, à noite").
+function evolutionMethod(evo) {
+  const parts = [];
+  if (evo.requiredContext) parts.push(itemName(evo.requiredContext));
+  for (const req of evo.requirements ?? []) {
+    switch (req.variant) {
+      case "level":
+        parts.push(`Nível ${req.minLevel ?? req.level ?? "?"}`);
+        break;
+      case "friendship":
+        parts.push("Amizade alta");
+        break;
+      case "time_range":
+        parts.push(req.range === "night" ? "à noite" : req.range === "day" ? "de dia" : req.range);
+        break;
+      case "held_item":
+        parts.push(`segurando ${itemName(req.itemCondition)}`);
+        break;
+      case "has_move_type":
+        parts.push(`sabendo golpe ${TYPE_PT[req.type] ?? req.type}`);
+        break;
+      case "has_move":
+        parts.push(`sabendo ${itemName(req.move) ?? req.move}`);
+        break;
+      case "move_type":
+        parts.push(`com golpe ${TYPE_PT[req.type] ?? req.type}`);
+        break;
+      case "properties":
+        break; // detalhe interno, não vira texto
+      default:
+        break;
+    }
+  }
+  if (evo.variant === "trade") parts.unshift("Troca");
+  return parts.join(", ") || "Subir de nível";
+}
+
+// Ordem canônica dos 6 stats + rótulo curto pt-BR (o JSON do Cobblemon usa
+// grafia britânica: "defence", "special_defence").
+const STAT_KEYS = [
+  ["hp", "hp"],
+  ["attack", "atk"],
+  ["defence", "def"],
+  ["special_attack", "spa"],
+  ["special_defence", "spd"],
+  ["speed", "spe"],
+];
+
+function baseStats(raw) {
+  if (!raw) return null;
+  const out = {};
+  let total = 0;
+  for (const [src, key] of STAT_KEYS) {
+    const value = Number(raw[src] ?? 0);
+    out[key] = value;
+    total += value;
+  }
+  out.total = total;
+  return out;
+}
+
 // Deriva as condições fixas de uma espécie a partir da lista de condições
 // dos seus spawns naturais (`condSet`). "Fixa" = presente em todos eles.
 function spawnConditions(conds) {
@@ -136,8 +219,9 @@ for (const file of fs.readdirSync(spawnPoolRoot)) {
   }
 }
 
-// 2. Espécies implementadas -> entrada final da dex
-const entries = [];
+// 2. Lê todos os arquivos de espécie primeiro (precisa do mapa id -> número
+//    da dex montado antes de resolver a cadeia de evolução).
+const rawSpecies = [];
 function walk(dir) {
   for (const name of fs.readdirSync(dir)) {
     const full = path.join(dir, name);
@@ -146,43 +230,76 @@ function walk(dir) {
       continue;
     }
     if (!name.endsWith(".json")) continue;
-
     const data = JSON.parse(fs.readFileSync(full, "utf8"));
     // "implemented" não é um sinal confiável (várias espécies com spawn de
     // verdade, ex. Groudon, não têm esse campo) — só exige o número da dex.
     if (!data.nationalPokedexNumber) continue;
-
-    const id = path.basename(name, ".json");
-    const descKey = data.pokedex?.[0];
-    const description = descKey ? (lang[descKey] ?? null) : null;
-    const spawn = spawnInfo.get(id);
-    const labels = data.labels ?? [];
-    const locationHidden = labels.some((label) => HIDDEN_LOCATION_LABELS.has(label));
-
-    entries.push({
-      number: data.nationalPokedexNumber,
-      id,
-      name: data.name,
-      types: [data.primaryType, data.secondaryType].filter(Boolean),
-      description,
-      labels,
-      rarity: spawn?.rarity ?? null,
-      biomes:
-        spawn && !locationHidden
-          ? [...spawn.biomeSet]
-              .map(biomeLabel)
-              .filter((b, i, arr) => arr.indexOf(b) === i)
-              .sort()
-          : [],
-      // Lendário -> sempre "?" na Dex, mesmo sem monumento no spawn pool.
-      hasMonument: locationHidden || Boolean(spawn?.monumentSet.size),
-      // Horário/clima exigido pra spawnar (só quando vale pra todo spawn
-      // natural da espécie) — ex.: ["Noite"], ["Chuva"]. [] = qualquer hora.
-      spawnConditions: spawn ? spawnConditions(spawn.condSet) : [],
-    });
+    rawSpecies.push({ id: path.basename(name, ".json"), data });
   }
 }
 walk(speciesRoot);
+
+// id da espécie (forma base, sem sufixo de forma) -> número nacional.
+const idToNumber = new Map();
+for (const { id, data } of rawSpecies) {
+  const base = id.split(" ")[0].toLowerCase();
+  if (!idToNumber.has(base)) idToNumber.set(base, data.nationalPokedexNumber);
+}
+function resolveNumber(speciesRef) {
+  if (!speciesRef) return null;
+  return idToNumber.get(String(speciesRef).split(" ")[0].toLowerCase()) ?? null;
+}
+
+// 3. Espécies -> entrada final da dex
+const entries = [];
+for (const { id, data } of rawSpecies) {
+  const descKey = data.pokedex?.[0];
+  const description = descKey ? (lang[descKey] ?? null) : null;
+  const spawn = spawnInfo.get(id);
+  const labels = data.labels ?? [];
+  const locationHidden = labels.some((label) => HIDDEN_LOCATION_LABELS.has(label));
+
+  // Cadeia de evolução: número da pré-evolução + lista das evoluções
+  // (número + método em texto). Dedup por número de destino porque algumas
+  // evoluções ramificam em formas que compartilham número.
+  const evoTo = [];
+  const seenEvo = new Set();
+  for (const evo of data.evolutions ?? []) {
+    const number = resolveNumber(evo.result);
+    if (!number || seenEvo.has(number)) continue;
+    seenEvo.add(number);
+    evoTo.push({ number, method: evolutionMethod(evo) });
+  }
+
+  entries.push({
+    number: data.nationalPokedexNumber,
+    id,
+    name: data.name,
+    types: [data.primaryType, data.secondaryType].filter(Boolean),
+    description,
+    labels,
+    rarity: spawn?.rarity ?? null,
+    biomes:
+      spawn && !locationHidden
+        ? [...spawn.biomeSet]
+            .map(biomeLabel)
+            .filter((b, i, arr) => arr.indexOf(b) === i)
+            .sort()
+        : [],
+    // Lendário -> sempre "?" na Dex, mesmo sem monumento no spawn pool.
+    hasMonument: locationHidden || Boolean(spawn?.monumentSet.size),
+    // Horário/clima exigido pra spawnar (só quando vale pra todo spawn
+    // natural da espécie) — ex.: ["Noite"], ["Chuva"]. [] = qualquer hora.
+    spawnConditions: spawn ? spawnConditions(spawn.condSet) : [],
+    // Stats base (hp/atk/def/spa/spd/spe + total).
+    baseStats: baseStats(data.baseStats),
+    // { from: número da pré-evolução | null, to: [{ number, method }] }
+    evolution: {
+      from: resolveNumber(data.preEvolution),
+      to: evoTo,
+    },
+  });
+}
 
 // Um arquivo por forma às vezes compartilha o número da dex com a forma
 // base (ex.: variações regionais) — mantém só a primeira ocorrência de cada
