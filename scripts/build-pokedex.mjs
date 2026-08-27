@@ -60,7 +60,44 @@ function biomeLabel(tag) {
 // JSON) — só se sabe que existe um, o jogador descobre qual explorando.
 const RARITY_RANK = { common: 0, uncommon: 1, rare: 2, "ultra-rare": 3 };
 
-// 1. Spawn pool -> Map<species_id, { rarity, biomeSet, hasMonument }>
+// Labels do Cobblemon que marcam um Pokémon como "especial". Pra esses o
+// local de spawn NUNCA vai pro JSON (nem bioma nem monumento) — a Dex mostra
+// só um "?". Decisão do usuário: todo lendário fica com a interrogação,
+// mesmo os que tecnicamente spawnam num bioma comum (bucket ultra-rare).
+const HIDDEN_LOCATION_LABELS = new Set(["legendary", "mythical", "ultra_beast"]);
+
+// Condições de horário/clima que o Cobblemon suporta no spawn. Só viram
+// texto na Dex quando valem pra TODOS os spawns naturais da espécie (ver
+// spawnConditions() abaixo) — aí é uma regra de verdade, não uma variação.
+const TIME_LABELS = { day: "Dia", night: "Noite", dawn: "Amanhecer", dusk: "Entardecer" };
+
+// Deriva as condições fixas de uma espécie a partir da lista de condições
+// dos seus spawns naturais (`condSet`). "Fixa" = presente em todos eles.
+function spawnConditions(conds) {
+  if (!conds.length) return [];
+  const out = [];
+
+  // Horário: só é regra se todo spawn natural define timeRange E o conjunto
+  // de valores não cobre o dia inteiro (day+night = sem regra na prática).
+  if (conds.every((c) => c.timeRange)) {
+    const times = [...new Set(conds.map((c) => c.timeRange))];
+    const coversDay = times.includes("day") && times.includes("night");
+    if (!coversDay) {
+      for (const t of ["day", "dawn", "dusk", "night"]) {
+        if (times.includes(t)) out.push(TIME_LABELS[t]);
+      }
+    }
+  }
+
+  // Clima.
+  if (conds.every((c) => c.isThundering === true)) out.push("Tempestade");
+  else if (conds.every((c) => c.isRaining === true)) out.push("Chuva");
+  else if (conds.every((c) => c.isRaining === false)) out.push("Tempo limpo");
+
+  return out;
+}
+
+// 1. Spawn pool -> Map<species_id, { rarity, biomeSet, monumentSet, condSet }>
 const spawnInfo = new Map();
 for (const file of fs.readdirSync(spawnPoolRoot)) {
   if (!file.endsWith(".json")) continue;
@@ -68,9 +105,14 @@ for (const file of fs.readdirSync(spawnPoolRoot)) {
   if (data.enabled === false) continue;
   for (const spawn of data.spawns ?? []) {
     if (spawn.type !== "pokemon") continue;
+    // Nota: mantém a chave crua (ex.: "pikachu region_bias=alola") como o
+    // script sempre fez — mudar pra base "pikachu" mesclaria formas e
+    // alteraria o JSON já publicado.
     const speciesId = (spawn.pokemon ?? "").toLowerCase();
     if (!speciesId) continue;
-    const entry = spawnInfo.get(speciesId) ?? { rarity: null, biomeSet: new Set(), monumentSet: new Set() };
+    const entry =
+      spawnInfo.get(speciesId) ??
+      { rarity: null, biomeSet: new Set(), monumentSet: new Set(), condSet: [] };
     if (spawn.bucket && (entry.rarity === null || RARITY_RANK[spawn.bucket] > RARITY_RANK[entry.rarity])) {
       entry.rarity = spawn.bucket;
     }
@@ -82,6 +124,13 @@ for (const file of fs.readdirSync(spawnPoolRoot)) {
       } else {
         entry.biomeSet.add(biome);
       }
+    }
+    // Só spawns "naturais" (no chão/água, sem preset de estrutura/pesca)
+    // contam pra regra de horário/clima — o resto é encontro pontual.
+    const cond = spawn.condition ?? {};
+    const natural = !spawn.presets?.length || spawn.presets.includes("natural");
+    if (natural && !cond.rodType && !cond.bait && !cond.bobber) {
+      entry.condSet.push(cond);
     }
     spawnInfo.set(speciesId, entry);
   }
@@ -107,6 +156,8 @@ function walk(dir) {
     const descKey = data.pokedex?.[0];
     const description = descKey ? (lang[descKey] ?? null) : null;
     const spawn = spawnInfo.get(id);
+    const labels = data.labels ?? [];
+    const locationHidden = labels.some((label) => HIDDEN_LOCATION_LABELS.has(label));
 
     entries.push({
       number: data.nationalPokedexNumber,
@@ -114,15 +165,20 @@ function walk(dir) {
       name: data.name,
       types: [data.primaryType, data.secondaryType].filter(Boolean),
       description,
-      labels: data.labels ?? [],
+      labels,
       rarity: spawn?.rarity ?? null,
-      biomes: spawn
-        ? [...spawn.biomeSet]
-            .map(biomeLabel)
-            .filter((b, i, arr) => arr.indexOf(b) === i)
-            .sort()
-        : [],
-      hasMonument: Boolean(spawn?.monumentSet.size),
+      biomes:
+        spawn && !locationHidden
+          ? [...spawn.biomeSet]
+              .map(biomeLabel)
+              .filter((b, i, arr) => arr.indexOf(b) === i)
+              .sort()
+          : [],
+      // Lendário -> sempre "?" na Dex, mesmo sem monumento no spawn pool.
+      hasMonument: locationHidden || Boolean(spawn?.monumentSet.size),
+      // Horário/clima exigido pra spawnar (só quando vale pra todo spawn
+      // natural da espécie) — ex.: ["Noite"], ["Chuva"]. [] = qualquer hora.
+      spawnConditions: spawn ? spawnConditions(spawn.condSet) : [],
     });
   }
 }

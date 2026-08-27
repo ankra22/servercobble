@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPokedexEntry, POKEDEX, TYPE_LABELS } from "@/lib/pokedex";
+import { getPokedexEntry, isLocationHidden, POKEDEX, TYPE_LABELS } from "@/lib/pokedex";
 import { PokemonSprite } from "@/components/PokemonSprite";
 import { ChevronMark } from "@/components/icons/Chevron";
 
@@ -28,7 +28,8 @@ export default async function DexEntryPage({ params }: PageProps) {
   const entry = getPokedexEntry(Number(number));
   if (!entry) notFound();
 
-  const foundInWild = entry.biomes.length > 0;
+  const locationHidden = isLocationHidden(entry);
+  const foundInWild = !locationHidden && entry.biomes.length > 0;
 
   return (
     <div className="min-h-full bg-nv">
@@ -75,7 +76,14 @@ export default async function DexEntryPage({ params }: PageProps) {
             <p className="mb-2 font-pixel text-[9px] uppercase tracking-wider text-lcd-faint">
               Onde encontrar
             </p>
-            {foundInWild || entry.hasMonument ? (
+            {locationHidden ? (
+              <span
+                title="Local mantido em segredo. Explora o mundo pra descobrir onde aparece."
+                className="inline-block border border-ball/35 bg-ball/10 px-2 py-0.5 font-body text-xs font-semibold text-ball"
+              >
+                ?
+              </span>
+            ) : foundInWild ? (
               <div className="flex flex-wrap gap-1.5">
                 {entry.biomes.map((biome) => (
                   <span
@@ -85,17 +93,25 @@ export default async function DexEntryPage({ params }: PageProps) {
                     {biome}
                   </span>
                 ))}
-                {entry.hasMonument && (
-                  <span
-                    title="Existe um monumento lendário. Explora o mundo pra descobrir onde."
-                    className="border border-ball/35 bg-ball/10 px-2 py-0.5 font-body text-xs font-semibold text-ball"
-                  >
-                    ?
-                  </span>
-                )}
               </div>
             ) : (
               <p className="font-body text-sm text-lcd-faint">Sem local de spawn registrado.</p>
+            )}
+
+            {entry.spawnConditions.length > 0 && (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="font-pixel text-[9px] uppercase tracking-wider text-lcd-faint">
+                  Condições
+                </span>
+                {entry.spawnConditions.map((condition) => (
+                  <span
+                    key={condition}
+                    className="border border-route/40 bg-route/10 px-2 py-0.5 font-body text-xs text-route"
+                  >
+                    {condition}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
         </div>
