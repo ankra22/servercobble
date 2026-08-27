@@ -16,7 +16,7 @@ function BadgeMedal({ gym, isEarned }: { gym: GymSlot; isEarned: boolean }) {
         shape={gym.rank === "champion" ? "star" : "badge"}
         size={size}
         locked={!isEarned}
-        className={isEarned ? "" : "text-ink-faint"}
+        className={isEarned ? "" : "text-lcd-faint"}
       />
     );
   }
@@ -43,6 +43,31 @@ function BadgeMedal({ gym, isEarned }: { gym: GymSlot; isEarned: boolean }) {
   );
 }
 
+function BadgeRow({ label, slots, earned }: { label: string; slots: GymSlot[]; earned: Set<string> }) {
+  if (slots.length === 0) return null;
+  return (
+    <div>
+      <p className="mb-1.5 font-pixel text-[9px] uppercase tracking-wide text-lcd-faint">{label}</p>
+      <div className="flex flex-wrap gap-x-3 gap-y-2">
+        {slots.map((gym) => {
+          const isEarned = earned.has(gym.name);
+          const suffix = gym.bonus ? " (pós-liga)" : "";
+          return (
+            <div key={gym.id} title={`${gym.name}${suffix}`} className="flex flex-col items-center gap-1">
+              <div className="text-lcd-faint">
+                <BadgeMedal gym={gym} isEarned={isEarned} />
+              </div>
+              <span className={`max-w-[3.5rem] truncate font-body text-[10px] ${isEarned ? "text-lcd-dim" : "text-lcd-faint"}`}>
+                {gym.name}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function RegionBadgeCase({
   region,
   earnedNames,
@@ -60,51 +85,26 @@ export function RegionBadgeCase({
   const championSlots = gyms.filter((g) => g.rank === "champion");
   const earnedCount = badgeSlots.filter((g) => earned.has(g.name)).length;
 
-  const Row = ({ label, slots }: { label: string; slots: GymSlot[] }) => {
-    if (slots.length === 0) return null;
-    return (
-      <div>
-        <p className="mb-1.5 font-pixel text-[9px] uppercase tracking-wide text-ink-faint">{label}</p>
-        <div className="flex flex-wrap gap-x-3 gap-y-2">
-          {slots.map((gym) => {
-            const isEarned = earned.has(gym.name);
-            const suffix = gym.bonus ? " (pós-liga)" : "";
-            return (
-              <div key={gym.id} title={`${gym.name}${suffix}`} className="flex flex-col items-center gap-1">
-                <div className="text-ink-faint">
-                  <BadgeMedal gym={gym} isEarned={isEarned} />
-                </div>
-                <span className={`max-w-[3.5rem] truncate text-[10px] ${isEarned ? "text-ink-dim" : "text-ink-faint"}`}>
-                  {gym.name}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="rounded-2xl border border-border bg-panel/60 p-4">
+    <div className="border border-lcd-edge bg-lcd-sunken p-4">
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h3 className="font-medium text-ink">{region.name}</h3>
+          <h3 className="font-body font-medium text-lcd-ink">{region.name}</h3>
           {isCurrent && (
-            <span className="rounded-full bg-brand-dim/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand">
+            <span className="bg-route px-1.5 py-0.5 font-pixel text-[8px] uppercase text-route-ink">
               Atual
             </span>
           )}
         </div>
-        <span className="text-xs text-ink-faint">
+        <span className="font-body text-xs text-lcd-faint">
           {earnedCount}/{badgeSlots.length} insígnias
         </span>
       </div>
 
       <div className="flex flex-col gap-3">
-        <Row label="Ginásios" slots={badgeSlots} />
-        <Row label="Elite Four" slots={eliteFourSlots} />
-        <Row label="Campeão" slots={championSlots} />
+        <BadgeRow label="Ginásios" slots={badgeSlots} earned={earned} />
+        <BadgeRow label="Elite Four" slots={eliteFourSlots} earned={earned} />
+        <BadgeRow label="Campeão" slots={championSlots} earned={earned} />
       </div>
     </div>
   );

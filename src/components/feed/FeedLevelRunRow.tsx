@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronMark } from "@/components/icons/Chevron";
 import type { FeedRow } from "@/lib/feed-grouping";
 import { toTitleCase } from "@/lib/format";
 
@@ -50,10 +50,8 @@ export function FeedLevelRunRow({
           &times;{count}
         </span>
 
-        <ChevronDown
-          aria-hidden="true"
-          className={`h-3.5 w-3.5 shrink-0 transition-transform ${expanded ? "rotate-180" : ""}`}
-          style={{ color: "var(--fd-ink-3)" }}
+        <ChevronMark
+          className={`h-3.5 w-3.5 shrink-0 [color:var(--fd-ink-3)] transition-transform ${expanded ? "rotate-180" : ""}`}
         />
       </button>
 

@@ -50,13 +50,13 @@ export function SpeciesFilter({ value, onChange, watchedSpecies, onWatchedSpecie
     <div className="space-y-2">
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <SearchMark className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
+          <SearchMark className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 [color:var(--fd-ink-3)]" />
           <input
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder="Buscar por espécie…"
-            className="w-full rounded-xl border border-border bg-panel/60 py-2.5 pl-10 pr-4 text-sm text-ink placeholder:text-ink-faint focus:border-brand/40 focus:outline-none"
+            className="fd-input w-full py-2 pl-9 pr-3 font-body text-sm focus:outline-none"
           />
         </div>
 
@@ -66,7 +66,7 @@ export function SpeciesFilter({ value, onChange, watchedSpecies, onWatchedSpecie
             onClick={handleAdd}
             disabled={isPending || !value.trim() || alreadyWatched}
             title="Adicionar essa espécie à sua lista — destaca em vermelho quando aparecer no feed"
-            className="shrink-0 rounded-xl border border-border px-3 py-2.5 text-xs font-medium text-ink-dim transition-colors hover:border-border-strong hover:text-ink disabled:opacity-50"
+            className="fd-chip shrink-0 px-3 py-2 text-xs font-medium disabled:opacity-50"
           >
             {alreadyWatched ? "Na lista ✓" : "+ Adicionar"}
           </button>
@@ -75,11 +75,11 @@ export function SpeciesFilter({ value, onChange, watchedSpecies, onWatchedSpecie
 
       {isSignedIn && watchedSpecies.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-xs text-ink-faint">De olho em:</span>
+          <span className="fd-pixel" style={{ color: "var(--fd-ink-3)" }}>De olho em</span>
           {watchedSpecies.map((species) => (
             <span
               key={species}
-              className="inline-flex items-center gap-1 rounded-full border border-watch/30 bg-watch-dim/40 py-1 pl-2.5 pr-1 text-xs font-medium text-watch"
+              className="fd-watch-tag inline-flex items-center gap-1 py-0.5 pl-2 pr-1 font-body text-xs font-medium"
             >
               {toTitleCase(species)}
               <button
@@ -87,7 +87,7 @@ export function SpeciesFilter({ value, onChange, watchedSpecies, onWatchedSpecie
                 onClick={() => handleRemove(species)}
                 disabled={isPending}
                 aria-label={`Remover ${toTitleCase(species)} da lista`}
-                className="rounded-full px-1 leading-none hover:bg-watch/20"
+                className="px-1 leading-none"
               >
                 ×
               </button>

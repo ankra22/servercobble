@@ -11,8 +11,10 @@ export const revalidate = 0;
 export default async function HomePage() {
   if (!isSupabaseConfigured) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <SetupNotice />
+      <div className="min-h-full bg-nv">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <SetupNotice />
+        </div>
       </div>
     );
   }
@@ -25,10 +27,12 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      {/* Sem herói: a faixa de status (com o h1 e os contadores) é renderizada
-          dentro do LiveFeed, que é quem sabe se o Realtime está conectado. */}
-      <LiveFeed initialEvents={events} initialWatchedSpecies={watchedSpecies} stats={stats} />
+    <div className="min-h-full bg-nv">
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
+        {/* Sem herói: a faixa de status (com o h1 e os contadores) é renderizada
+            dentro do LiveFeed, que é quem sabe se o Realtime está conectado. */}
+        <LiveFeed initialEvents={events} initialWatchedSpecies={watchedSpecies} stats={stats} />
+      </div>
     </div>
   );
 }

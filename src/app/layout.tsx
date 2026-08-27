@@ -1,24 +1,26 @@
 import type { Metadata } from "next";
-import { Archivo, IBM_Plex_Mono, Silkscreen } from "next/font/google";
+import { IBM_Plex_Mono, Silkscreen, Rubik } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { SiteSectionNav } from "@/components/navigation/SiteSectionNav";
 import { ClickSpark } from "@/components/ClickSpark";
 
-const display = Archivo({
-  variable: "--font-display",
+// Identidade "Pokédex de bolso": fonte de leitura — arredondada e quente, pra
+// corpo e listas. Variável, sem weight fixo.
+const body = Rubik({
+  variable: "--font-body",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
+// Mono pra dados tabulares (contagens, horários, IVs, @username).
 const data = IBM_Plex_Mono({
   variable: "--font-data",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
 });
 
-// Bitmap de verdade. Só a 10px, em eyebrow / divisor de dia / chip.
+// Bitmap de verdade. Só em rótulos curtos: eyebrow, cabeçalho, chip, wordmark.
 const pixel = Silkscreen({
   variable: "--font-pixel",
   subsets: ["latin"],
@@ -36,10 +38,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${display.variable} ${pixel.variable} ${data.variable} h-full`}>
+    <html lang="pt-BR" className={`${body.variable} ${data.variable} ${pixel.variable} h-full`}>
       <body className="min-h-full antialiased">
         <ClerkProvider afterSignOutUrl="/feed">
-          <ClickSpark sparkColor="#7bffb0" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
+          <ClickSpark sparkColor="#f2c12e" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
             <div className="fixed left-6 top-1/2 z-30 hidden -translate-y-1/2 2xl:block">
               <SiteSectionNav />
             </div>

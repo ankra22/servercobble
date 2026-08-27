@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { FEED_SELECT } from "@/lib/queries/feed";
 import type { FeedEvent, FeedEventType, FeedEventWithTrainer, Trainer } from "@/lib/database.types";
@@ -127,7 +126,7 @@ export function LiveFeed({
     : typeFiltered;
 
   return (
-    <div className="feed fd-grid flex flex-col gap-4 px-1">
+    <div className="feed fd-grid flex flex-col gap-4 p-4 sm:p-5">
       {stats && <FeedStatusStrip stats={stats} connected={connected} />}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -137,7 +136,12 @@ export function LiveFeed({
             {connected ? (
               <LiveDot />
             ) : (
-              <span className="rounded-full border border-border px-3 py-1 text-xs text-ink-faint">conectando…</span>
+              <span
+                className="fd-pixel border px-2 py-1"
+                style={{ borderColor: "var(--fd-line-2)", color: "var(--fd-ink-3)" }}
+              >
+                conectando…
+              </span>
             )}
           </span>
         )}
@@ -153,9 +157,9 @@ export function LiveFeed({
       )}
 
       {visibleEvents.length === 0 ? (
-        <div className="rounded-md border border-dashed border-border p-10 text-center text-sm text-ink-faint">
-          {emptyMessage}
-        </div>
+        <p className="fd-mono px-1 py-8 text-center text-[13px] leading-relaxed" style={{ color: "var(--fd-ink-3)" }}>
+          <span style={{ color: "var(--fd-ink-2)" }}>&gt;</span> {emptyMessage}
+        </p>
       ) : (
         <FeedTimeline events={visibleEvents} newIds={newIds} watchedSpecies={watchedSpecies} />
       )}
@@ -167,7 +171,12 @@ export function LiveFeed({
           disabled={loadingMore}
           className="fd-chip mx-auto mt-4 flex items-center gap-2 px-3 py-2 disabled:opacity-50"
         >
-          {loadingMore && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+          {loadingMore && (
+            <span
+              aria-hidden="true"
+              className="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent motion-reduce:animate-none"
+            />
+          )}
           <span className="fd-pixel">Carregar mais</span>
         </button>
       )}

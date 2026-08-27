@@ -2,130 +2,54 @@
 @import "../components/feed/feed-theme.css";
 
 /* ==========================================================================
-   Design tokens — "Terminal de Laboratório": tema fixo, escuro, verde-
-   fósforo, inspirado num terminal de PC de Pokémon de verdade (tela CRT,
-   não um dashboard SaaS genérico). Os tokens --color-* viram
-   automaticamente utilitários Tailwind (bg-brand, text-shiny, border-rare,
-   etc).
+   Design tokens — Identidade "Pokédex de bolso" (GBA). Os tokens --color-*
+   viram automaticamente utilitários Tailwind (bg-nv, text-lcd-ink, border-
+   lcd-edge, bg-route, etc).
+
+   Fundo = carcaça azul-marinho (--color-nv) · conteúdo = "tela" LCD verde-
+   lavada, clara, tinta escura (--color-lcd*) · amarelo de placa de rota
+   (--color-route) = acento/raridade · vermelho de PokéBola (--color-ball) =
+   alerta/ponteiro.
+
+   O feed tem tokens de escopo próprio (--fd-*) em components/feed/feed-theme.css.
    ========================================================================== */
 :root {
-  --color-bg: #070b09;
-  --color-bg-elevated: #0c130f;
-  --color-panel: #0f1a14;
-  --color-panel-hover: #142219;
-  --color-border: #1d3527;
-  --color-border-strong: #2c4d38;
-  --color-ink: #d8f5e4;
-  --color-ink-dim: #7fa891;
-  --color-ink-faint: #4d6b5a;
-
-  --color-brand: #7bffb0;
-  --color-brand-dim: #0f3322;
-
-  --color-rare: #ffe066;
-  --color-rare-dim: #4a3c0a;
-  --color-capture: #7bffb0;
-  --color-capture-dim: #0f3322;
-  --color-battle: #ff5c7a;
-  --color-battle-dim: #4a1420;
-  --color-evolution: #c792ff;
-  --color-evolution-dim: #33204a;
-  --color-levelup: #5cc8ff;
-  --color-levelup-dim: #0e3348;
-  --color-shiny: #ffe066;
-  --color-shiny-dim: #4a3c0a;
-
-  /* Destaque de "Pokémon que você está de olho" (preferência salva) — eixo
-     separado dos tons de evento acima, por isso um vermelho mais puro/vivo
-     do que o --color-battle (rosado, específico de ginásio). */
-  --color-watch: #ff3b5c;
-  --color-watch-dim: #4a0f18;
+  --color-nv: #171d47;
+  --color-nv-deep: #10143a;
+  --color-nv-line: #2b3268;
+  --color-lcd: #dbe0cd;
+  --color-lcd-sunken: #ccd2b9;
+  --color-lcd-ink: #20241a;
+  --color-lcd-dim: #55604a;
+  --color-lcd-faint: #7c866c;
+  --color-lcd-edge: #0c1236;
+  --color-route: #f2c12e;
+  --color-route-ink: #3a2b00;
+  --color-ball: #d94a2f;
 }
 
 @theme inline {
-  --color-bg: var(--color-bg);
-  --color-bg-elevated: var(--color-bg-elevated);
-  --color-panel: var(--color-panel);
-  --color-panel-hover: var(--color-panel-hover);
-  --color-border: var(--color-border);
-  --color-border-strong: var(--color-border-strong);
-  --color-ink: var(--color-ink);
-  --color-ink-dim: var(--color-ink-dim);
-  --color-ink-faint: var(--color-ink-faint);
+  --color-nv: var(--color-nv);
+  --color-nv-deep: var(--color-nv-deep);
+  --color-nv-line: var(--color-nv-line);
+  --color-lcd: var(--color-lcd);
+  --color-lcd-sunken: var(--color-lcd-sunken);
+  --color-lcd-ink: var(--color-lcd-ink);
+  --color-lcd-dim: var(--color-lcd-dim);
+  --color-lcd-faint: var(--color-lcd-faint);
+  --color-lcd-edge: var(--color-lcd-edge);
+  --color-route: var(--color-route);
+  --color-route-ink: var(--color-route-ink);
+  --color-ball: var(--color-ball);
 
-  --color-brand: var(--color-brand);
-  --color-brand-dim: var(--color-brand-dim);
-
-  --color-rare: var(--color-rare);
-  --color-rare-dim: var(--color-rare-dim);
-  --color-capture: var(--color-capture);
-  --color-capture-dim: var(--color-capture-dim);
-  --color-battle: var(--color-battle);
-  --color-battle-dim: var(--color-battle-dim);
-  --color-evolution: var(--color-evolution);
-  --color-evolution-dim: var(--color-evolution-dim);
-  --color-levelup: var(--color-levelup);
-  --color-levelup-dim: var(--color-levelup-dim);
-  --color-shiny: var(--color-shiny);
-  --color-shiny-dim: var(--color-shiny-dim);
-
-  --color-watch: var(--color-watch);
-  --color-watch-dim: var(--color-watch-dim);
-
-  --font-sans: var(--font-display);
+  --font-sans: var(--font-body);
   --font-mono: var(--font-data);
   --font-pixel: var(--font-pixel);
-
-  --animate-slide-in: slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-pulse-live: pulse-live 2s ease-in-out infinite;
-  --animate-pulse-watch: pulse-watch 1.8s ease-in-out infinite;
-  --animate-shimmer: shimmer 2.4s linear infinite;
-}
-
-@keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(-10px) scale(0.99);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes pulse-live {
-  0%,
-  100% {
-    opacity: 1;
-    box-shadow: 0 0 0 0 rgb(123 255 176 / 0.55);
-  }
-  50% {
-    opacity: 0.7;
-    box-shadow: 0 0 0 6px rgb(123 255 176 / 0);
-  }
-}
-
-@keyframes pulse-watch {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgb(255 59 92 / 0.45);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgb(255 59 92 / 0);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  --font-body: var(--font-body);
 }
 
 * {
-  border-color: var(--color-border);
+  border-color: var(--color-nv-line);
 }
 
 html {
@@ -133,17 +57,18 @@ html {
 }
 
 body {
-  background: var(--color-bg);
-  color: var(--color-ink);
+  /* Identidade 01: carcaça azul-marinho. Sem glow radial (era assinatura de
+     landing gerada). O texto padrão fica claro pra ler sobre o marinho —
+     páginas ainda não migradas definem suas próprias cores por cima. */
+  background: var(--color-nv);
+  color: var(--color-lcd);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: 19px;
-  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgb(123 255 176 / 0.08), transparent);
-  background-size: 100% 100%;
-  background-attachment: fixed;
   position: relative;
 }
 
-/* Scanline sutil de CRT sobre a tela inteira — decorativo, não intercepta clique. */
+/* Scanline sutil de tela — decorativo, não intercepta clique. Mais leve que
+   a versão CRT antiga: aqui é o brilho de um LCD de handheld. */
 body::after {
   content: "";
   position: fixed;
@@ -152,13 +77,13 @@ body::after {
   pointer-events: none;
   background-image: repeating-linear-gradient(
     0deg,
-    rgb(0 0 0 / 0.1) 0px,
-    rgb(0 0 0 / 0.1) 1px,
+    rgb(0 0 0 / 0.07) 0px,
+    rgb(0 0 0 / 0.07) 1px,
     transparent 1px,
     transparent 3px
   );
   mix-blend-mode: overlay;
-  opacity: 0.5;
+  opacity: 0.35;
 }
 
 /* Rótulos curtos e de marca (nav, tags de evento, títulos de página) — a
@@ -169,8 +94,8 @@ body::after {
 }
 
 ::selection {
-  background: var(--color-brand);
-  color: var(--color-bg);
+  background: var(--color-route);
+  color: var(--color-nv-deep);
 }
 
 ::-webkit-scrollbar {
@@ -178,15 +103,15 @@ body::after {
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-bg);
+  background: var(--color-nv-deep);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
+  background: var(--color-nv-line);
   border-radius: 999px;
-  border: 2px solid var(--color-bg);
+  border: 2px solid var(--color-nv-deep);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-ink-faint);
+  background: var(--color-route);
 }
 
 /* Pixel art (sprites, skins) sem borrão de upscale */
@@ -197,6 +122,39 @@ body::after {
 
 .font-data {
   font-family: var(--font-data), ui-monospace, monospace;
+}
+
+/* ==========================================================================
+   Identidade 01 — superfície "tela LCD". Painel claro de leitura (tinta
+   escura) que mora sobre a carcaça marinho. Linhas horizontais de LCD +
+   moldura escura afundada. Usar nas telas migradas (por ora: /dex).
+   ========================================================================== */
+.t01-screen {
+  background-color: var(--color-lcd);
+  color: var(--color-lcd-ink);
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgb(0 0 0 / 0.045) 0 1px,
+    transparent 1px 3px
+  );
+  box-shadow:
+    inset 0 0 0 2px var(--color-lcd-edge),
+    inset 0 3px 12px rgb(0 0 0 / 0.16);
+}
+
+.t01-screen ::selection {
+  background: var(--color-ball);
+  color: var(--color-lcd);
+}
+
+/* Campo de texto padrão da identidade 01 — afundado na tela LCD. */
+.t01-input {
+  border: 2px solid var(--color-lcd-edge);
+  background: var(--color-lcd-sunken);
+  color: var(--color-lcd-ink);
+}
+.t01-input::placeholder {
+  color: var(--color-lcd-faint);
 }
 
 /* `.fixed-video-bg` (ver FixedVideoBackground.tsx) — vídeo fixo cobrindo a
@@ -211,11 +169,14 @@ body::after {
 }
 
 /* ==========================================================================
-   Landing (/) — sequência de telas cheias com scroll-snap nativo, com o
-   `.fixed-video-bg` atrás das 5 seções. Cada `.landing-section` define
-   `--glow` (um token --color-* do tema) pro halo + grid por cima do vídeo, e
-   um `background-color` translúcido faz de véu pra manter o texto legível
-   sem esconder o vídeo por completo.
+   Landing (/) — identidade 01. Sequência de telas cheias com scroll-snap
+   nativo, com o `.fixed-video-bg` (`hero-reel.mp4`) atrás das 5 seções.
+
+   Hero (seção 1): o vídeo aparece cheio, só com um scrim escuro leve pro texto.
+   Seções 2–5: um véu LCD FORTE por cima do vídeo — radial, quase sólido no
+   centro (onde o texto mora) e deixando ~20% da cena passar nas beiradas.
+   Assim é "a mesma tela, vistas diferentes" sem parágrafo sobre vídeo mexendo.
+   Sem os 5 tons por seção (`--glow` saiu) — um acento só, amarelo de rota.
    ========================================================================== */
 .landing-shell {
   height: 100dvh;
@@ -223,25 +184,64 @@ body::after {
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
   overscroll-behavior-y: contain;
+  background: var(--color-nv);
+  /* Sem scrollbar visível: os ProgressDots + scroll-snap já dão a posição, e a
+     calha da scrollbar deixava uma faixa à direita onde o vídeo (fixed, tela
+     cheia) vazava por baixo das seções. */
+  scrollbar-width: none;
+}
+.landing-shell::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 .landing-section {
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  background-color: color-mix(in srgb, var(--color-bg) 74%, transparent);
-  background-image: radial-gradient(
-    ellipse 65% 55% at 50% 8%,
-    color-mix(in srgb, var(--glow) 24%, transparent),
-    transparent 70%
-  );
-  background-size: 100% 100%;
 }
 
-.landing-hero-title {
-  text-shadow:
-    0 0 2px rgb(255 255 255 / 0.6),
-    0 0 44px rgb(255 255 255 / 0.28);
+/* Véu LCD numa camada fixa (não por seção) — cobre EXATAMENTE o mesmo retângulo
+   que o vídeo `.fixed-video-bg` (viewport inteiro), então não sobra faixa em
+   canto nenhum. Fica transparente no hero (o texto do hero tem a plaquinha
+   `.landing-hero-plate`); nas outras seções vira a "tela" quase opaca. */
+.landing-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-color: color-mix(in srgb, var(--color-lcd) 90%, transparent);
+  background-image: radial-gradient(
+    130% 90% at 50% 28%,
+    color-mix(in srgb, var(--color-lcd) 16%, transparent),
+    transparent 66%
+  );
+  opacity: 1;
+  transition: opacity 300ms ease;
 }
+.landing-veil[data-hero="true"] {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-veil {
+    transition: none;
+  }
+}
+
+/* Plaquinha de contraste atrás do texto do hero — radial suave que escurece o
+   vídeo só onde o texto mora (canto esquerdo), sem virar caixa dura. */
+.landing-hero-plate { position: relative; }
+.landing-hero-plate::before {
+  content: "";
+  position: absolute;
+  inset: -1.5rem -18% -1.75rem -12%;
+  background: radial-gradient(
+    70% 84% at 22% 50%,
+    color-mix(in srgb, var(--color-nv-deep) 84%, transparent),
+    transparent 82%
+  );
+}
+.landing-hero-plate > * { position: relative; }
 
 @keyframes hint-bounce {
   0%,

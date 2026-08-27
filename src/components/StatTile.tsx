@@ -1,18 +1,17 @@
-import type { Tone } from "@/lib/tone-classes";
-import { TONE_CLASSES } from "@/lib/tone-classes";
-
 interface StatTileProps {
   label: string;
   value: string | number;
-  tone?: Tone;
+  /** Destaca o número em dourado (usado pra shinies). */
+  gold?: boolean;
 }
 
-export function StatTile({ label, value, tone = "brand" }: StatTileProps) {
-  const toneClasses = TONE_CLASSES[tone];
+export function StatTile({ label, value, gold = false }: StatTileProps) {
   return (
-    <div className="rounded-2xl border border-border bg-panel/60 p-4">
-      <p className={`font-data text-xl font-semibold leading-none ${toneClasses.text}`}>{value}</p>
-      <p className="mt-1.5 truncate text-xs text-ink-faint">{label}</p>
+    <div className="border border-lcd-edge bg-lcd-sunken p-3.5">
+      <p className={`font-data text-2xl font-semibold leading-none ${gold ? "text-[#9a6b12]" : "text-lcd-ink"}`}>
+        {value}
+      </p>
+      <p className="mt-1.5 truncate font-body text-xs text-lcd-dim">{label}</p>
     </div>
   );
 }

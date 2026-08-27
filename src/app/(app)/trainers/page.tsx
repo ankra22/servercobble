@@ -11,8 +11,10 @@ export const revalidate = 0;
 export default async function TrainersPage() {
   if (!isSupabaseConfigured) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <SetupNotice />
+      <div className="min-h-full bg-nv">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <SetupNotice />
+        </div>
       </div>
     );
   }
@@ -21,12 +23,18 @@ export default async function TrainersPage() {
   const trainers = await listTrainers(supabase);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <h1 className="font-pixel text-lg text-ink sm:text-xl">Treinadores</h1>
-      <p className="mt-1.5 text-sm text-ink-dim">{trainers.length} treinador(es) registrados no servidor.</p>
+    <div className="min-h-full bg-nv">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+        <header className="mb-6">
+          <h1 className="font-pixel text-lg text-route">Treinadores</h1>
+          <p className="mt-2 font-body text-sm text-lcd/70">
+            {trainers.length} treinador(es) registrados no servidor.
+          </p>
+        </header>
 
-      <div className="mt-6">
-        <TrainerDirectory trainers={trainers} />
+        <div className="t01-screen p-4 sm:p-5">
+          <TrainerDirectory trainers={trainers} />
+        </div>
       </div>
     </div>
   );

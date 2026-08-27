@@ -33,8 +33,10 @@ export default async function RegionPage({ params }: PageProps) {
 
   if (!isSupabaseConfigured) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-        <SetupNotice />
+      <div className="min-h-full bg-nv">
+        <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
+          <SetupNotice />
+        </div>
       </div>
     );
   }
@@ -43,80 +45,82 @@ export default async function RegionPage({ params }: PageProps) {
   const progress = await getRegionProgress(supabase, region.id);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <Link
-        href="/regioes"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-ink-faint transition-colors hover:text-ink"
-      >
-        <ChevronMark className="h-4 w-4 rotate-90" />
-        Voltar pras regiões
-      </Link>
+    <div className="min-h-full bg-nv">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+        <Link
+          href="/regioes"
+          className="mb-6 inline-flex items-center gap-1.5 font-body text-sm text-lcd/60 transition-colors hover:text-lcd"
+        >
+          <ChevronMark className="h-4 w-4 rotate-90" />
+          Voltar pras regiões
+        </Link>
 
-      <section
-        className="mb-8 overflow-hidden rounded-3xl border border-border bg-panel/60 bg-cover bg-center px-6 py-10 sm:px-8 sm:py-14"
-        style={{ backgroundImage: `linear-gradient(180deg, rgba(6,0,16,0.35), rgba(6,0,16,0.85)), url(${region.image})` }}
-      >
-        <h1 className="font-pixel text-lg text-white sm:text-xl">{region.name}</h1>
-        <p className="mt-1.5 max-w-md text-sm text-white/80">{region.description}</p>
-      </section>
+        <section
+          className="mb-6 overflow-hidden border-2 border-lcd-edge bg-cover bg-center px-6 py-10 sm:px-8 sm:py-14"
+          style={{ backgroundImage: `linear-gradient(180deg, rgba(16,20,58,0.4), rgba(16,20,58,0.88)), url(${region.image})` }}
+        >
+          <h1 className="font-pixel text-lg text-route sm:text-xl">{region.name}</h1>
+          <p className="mt-2 max-w-md font-body text-sm text-white/85">{region.description}</p>
+        </section>
 
-      <h2 className="mb-3 font-pixel text-[10px] uppercase tracking-wide text-ink-dim">
-        Treinadores em {region.name}
-      </h2>
+        <h2 className="mb-3 font-pixel text-[10px] uppercase tracking-wide text-lcd/60">
+          Treinadores em {region.name}
+        </h2>
 
-      {progress.length === 0 ? (
-        <p className="rounded-2xl border border-border bg-panel/60 p-6 text-sm text-ink-faint">
-          Ninguém está presente nessa região agora.
-        </p>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {progress.map(({ trainer, badges }) => {
-            const current = badges[badges.length - 1];
-            return (
-              <Link
-                key={trainer.id}
-                href={`/trainers/${trainer.username}`}
-                className="group rounded-2xl border border-border bg-panel/60 p-4 transition-all hover:-translate-y-0.5 hover:border-border-strong hover:bg-panel-hover"
-              >
-                <div className="flex items-center gap-3.5">
-                  <TrainerAvatar displayName={trainer.display_name} skinUrl={trainer.skin_url} size={44} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-ink transition-colors group-hover:text-brand">
-                      {trainer.display_name}
-                    </p>
-                    <p className="text-xs text-ink-faint">
-                      {current ? (
-                        <>
-                          Ginásio atual: <span className="text-battle">{current.gymLeaderName}</span>
-                          <span className="ml-1 text-ink-faint">· {formatDate(current.defeatedAt)}</span>
-                        </>
-                      ) : (
-                        "Ainda não venceu nenhum ginásio aqui."
-                      )}
-                    </p>
+        {progress.length === 0 ? (
+          <p className="font-data px-1 py-8 text-center text-[13px] text-lcd/70">
+            <span className="text-lcd/45">&gt;</span> ninguém está presente nessa região agora
+          </p>
+        ) : (
+          <div className="flex flex-col gap-2.5">
+            {progress.map(({ trainer, badges }) => {
+              const current = badges[badges.length - 1];
+              return (
+                <Link
+                  key={trainer.id}
+                  href={`/trainers/${trainer.username}`}
+                  className="group border border-lcd-edge bg-lcd-sunken p-3.5 transition-colors hover:bg-lcd"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <TrainerAvatar displayName={trainer.display_name} skinUrl={trainer.skin_url} size={44} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-body font-medium text-lcd-ink transition-colors group-hover:text-[#9a6b12]">
+                        {trainer.display_name}
+                      </p>
+                      <p className="font-body text-xs text-lcd-faint">
+                        {current ? (
+                          <>
+                            Ginásio atual: <span className="text-[#cc3f28]">{current.gymLeaderName}</span>
+                            <span className="ml-1">&middot; {formatDate(current.defeatedAt)}</span>
+                          </>
+                        ) : (
+                          "Ainda não venceu nenhum ginásio aqui."
+                        )}
+                      </p>
+                    </div>
+                    <span className="shrink-0 bg-route px-1.5 py-0.5 font-pixel text-[8px] uppercase text-route-ink">
+                      {badges.length} insígnia{badges.length === 1 ? "" : "s"}
+                    </span>
                   </div>
-                  <span className="shrink-0 rounded-full bg-battle-dim/40 px-2.5 py-1 text-xs font-medium text-battle">
-                    {badges.length} insígnia{badges.length === 1 ? "" : "s"}
-                  </span>
-                </div>
 
-                {badges.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1.5 pl-[59px]">
-                    {badges.map((badge) => (
-                      <span
-                        key={badge.gymLeaderName}
-                        className="rounded-full border border-border bg-bg-elevated px-2.5 py-1 text-xs text-ink-dim"
-                      >
-                        {badge.gymLeaderName}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      )}
+                  {badges.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5 pl-[59px]">
+                      {badges.map((badge) => (
+                        <span
+                          key={badge.gymLeaderName}
+                          className="border border-lcd-edge bg-lcd px-2 py-0.5 font-body text-xs text-lcd-dim"
+                        >
+                          {badge.gymLeaderName}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

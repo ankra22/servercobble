@@ -10,15 +10,16 @@ export function TeamPCTabs({ team, pc }: { team: Pokemon[]; pc: Pokemon[] }) {
 
   return (
     <div>
-      <div className="flex gap-1 rounded-xl border border-border bg-panel/50 p-1">
-        <TabButton active={tab === "team"} onClick={() => setTab("team")} label={`Time atual`} count={team.length} />
+      <div className="flex gap-1 border border-lcd-edge bg-lcd-sunken p-1">
+        <TabButton active={tab === "team"} onClick={() => setTab("team")} label="Time atual" count={team.length} />
         <TabButton active={tab === "pc"} onClick={() => setTab("pc")} label="PC" count={pc.length} />
       </div>
 
       {active.length === 0 ? (
-        <div className="mt-4 rounded-2xl border border-dashed border-border p-8 text-center text-sm text-ink-faint">
-          {tab === "team" ? "Nenhum Pokémon no time no momento." : "PC vazio."}
-        </div>
+        <p className="font-data mt-4 px-1 py-8 text-center text-[13px] text-lcd-dim">
+          <span className="text-lcd-faint">&gt;</span>{" "}
+          {tab === "team" ? "nenhum Pokémon no time no momento" : "PC vazio"}
+        </p>
       ) : (
         <div className="mt-4 grid grid-cols-1 items-start gap-2.5 sm:grid-cols-2">
           {active.map((pokemon) => (
@@ -35,8 +36,8 @@ function TabButton({ active, onClick, label, count }: { active: boolean; onClick
     <button
       type="button"
       onClick={onClick}
-      className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-        active ? "bg-brand-dim/50 text-brand" : "text-ink-dim hover:text-ink"
+      className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-2 font-body text-sm font-medium transition-colors ${
+        active ? "bg-lcd text-lcd-ink shadow-[inset_0_-2px_0_var(--color-route)]" : "text-lcd-dim hover:text-lcd-ink"
       }`}
     >
       {label}

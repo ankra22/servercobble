@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
 import type { Trainer } from "@/lib/database.types";
+import { SearchMark } from "@/components/icons/Search";
 import { TrainerCard } from "@/components/trainer/TrainerCard";
 
 export function TrainerDirectory({ trainers }: { trainers: Trainer[] }) {
@@ -18,21 +18,21 @@ export function TrainerDirectory({ trainers }: { trainers: Trainer[] }) {
 
   return (
     <div>
-      <div className="relative mb-6">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
+      <div className="relative mb-5">
+        <SearchMark className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-lcd-faint" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar treinador por nome ou username…"
-          className="w-full rounded-xl border border-border bg-panel/60 py-2.5 pl-10 pr-4 text-sm text-ink placeholder:text-ink-faint focus:border-brand/40 focus:outline-none"
+          placeholder="Buscar treinador por nome ou username"
+          className="t01-input w-full py-2 pl-9 pr-3 font-body text-sm focus:outline-none focus:ring-2 focus:ring-ball/50"
         />
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-ink-faint">
-          Nenhum treinador encontrado.
-        </div>
+        <p className="font-data px-1 py-8 text-center text-[13px] text-lcd-dim">
+          <span className="text-lcd-faint">&gt;</span> nenhum treinador com &ldquo;{query}&rdquo;
+        </p>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((trainer) => (

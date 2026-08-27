@@ -1,48 +1,52 @@
 /* ==========================================================================
    Feed — tokens de escopo próprio.
 
-   Ficam sob `.feed` de propósito, e NÃO em :root: o resto do site (regiões,
-   pokédex, perfil) continua nos tokens antigos, então esta mudança não pode
-   quebrar nada fora do feed. Migrar o site inteiro pra cá é tarefa própria.
+   Identidade 01 ("Pokédex de bolso"): o feed agora é a "tela LCD" verde-lavada
+   (tinta escura) que mora sobre a carcaça marinho, igual à /dex. Os valores
+   abaixo invertem o tema antigo (claro sobre quase-preto → escuro sobre LCD),
+   mas a ENGENHARIA continua igual: trilho + nó quadrado + TAMANHO codifica
+   raridade + linha embutida no destaque.
 
-   Decisão central: cor deixa de significar CATEGORIA de evento e passa a
-   significar RARIDADE. Antes eram 6 cores no mesmo peso de saturação, então
-   nenhuma sinalizava nada. Agora só o ouro é saturado.
+   Decisão central mantida: cor não significa CATEGORIA de evento, significa
+   RARIDADE. Só o ouro de placa de rota é saturado.
    ========================================================================== */
 
 .feed {
-  --fd-bg: #08090b;
-  --fd-surface: #0d0f13;
-  --fd-surface-2: #12151b;
+  --fd-bg: #dbe0cd;         /* tela LCD (= --color-lcd) */
+  --fd-surface: #d0d6bd;    /* linha em hover */
+  --fd-surface-2: #c6ccb2;  /* blocos do skeleton */
 
-  --fd-line: #1c2029;
-  --fd-line-2: #272d39;
+  --fd-line: rgb(12 18 54 / 0.14);
+  --fd-line-2: rgb(12 18 54 / 0.24);
 
-  /* 14,2:1 / 6,8:1 / 3,4:1 sobre --fd-bg */
-  --fd-ink: #e6eaf0;
-  --fd-ink-2: #97a1b0;
-  --fd-ink-3: #5a6472;
+  /* tinta escura sobre o LCD */
+  --fd-ink: #20241a;
+  --fd-ink-2: #55604a;
+  --fd-ink-3: #7c866c;
 
-  --fd-note: #6ea8c7; /* notável — azul frio dessaturado */
-  --fd-rare: #e8b339; /* raro — a única cor saturada do feed */
-  --fd-rare-soft: #2a2109;
-  --fd-watch: #e05252; /* espécie observada pelo usuário */
+  --fd-note: #2f6ea0; /* notável — azul frio, legível sobre o LCD */
+  --fd-rare: #b9791a; /* raro — ouro de placa de rota, escurecido pra segurar contraste no LCD */
+  --fd-rare-soft: rgb(242 193 46 / 0.16);
+  --fd-watch: #cc3f28; /* espécie observada pelo usuário (vermelho de PokéBola) */
 
   color: var(--fd-ink);
-  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* --------------------------------------------------------------------------
-   Textura — grade de pixel de 4px em contraste quase nulo. O achatamento
-   total (painel chapado sobre fundo chapado) é assinatura de output gerado;
-   isto resolve sem virar decoração. Se der pra apontar, está forte demais.
+   Superfície + textura. A grade de 4px em contraste quase nulo continua: o
+   achatamento total (painel chapado sobre fundo chapado) é assinatura de
+   output gerado. Aqui ela também carrega a moldura afundada da tela LCD.
    -------------------------------------------------------------------------- */
 .fd-grid {
   background-color: var(--fd-bg);
   background-image:
-    linear-gradient(to right, rgb(255 255 255 / 0.013) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 0.013) 1px, transparent 1px);
+    linear-gradient(to right, rgb(12 18 54 / 0.022) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(12 18 54 / 0.022) 1px, transparent 1px);
   background-size: 4px 4px;
+  box-shadow:
+    inset 0 0 0 2px var(--color-lcd-edge),
+    inset 0 3px 12px rgb(0 0 0 / 0.16);
 }
 
 /* --------------------------------------------------------------------------
@@ -97,7 +101,7 @@
   /* halo em degrau, não blur: mantém a aresta dura da grade */
   box-shadow:
     0 0 0 3px var(--fd-bg),
-    0 0 0 4px rgb(232 179 57 / 0.28);
+    0 0 0 4px rgb(185 121 26 / 0.3);
 }
 
 .fd-node--watch {
@@ -107,7 +111,7 @@
 .fd-node--watch.fd-node--highlight {
   box-shadow:
     0 0 0 3px var(--fd-bg),
-    0 0 0 4px rgb(224 82 82 / 0.3);
+    0 0 0 4px rgb(204 63 40 / 0.32);
 }
 
 /* Trilho: fio de 1px atrás da coluna dos nós. */
@@ -134,12 +138,12 @@
    lavagem dourada baixa. Mais denso e mais "serviço de notícias" que uma
    caixa com sombra. */
 .fd-row--highlight {
-  background: linear-gradient(90deg, rgb(232 179 57 / 0.07), rgb(232 179 57 / 0) 55%);
+  background: linear-gradient(90deg, rgb(242 193 46 / 0.22), rgb(242 193 46 / 0) 55%);
   box-shadow: inset 2px 0 0 var(--fd-rare);
 }
 
 .fd-row--watch {
-  background: linear-gradient(90deg, rgb(224 82 82 / 0.08), rgb(224 82 82 / 0) 55%);
+  background: linear-gradient(90deg, rgb(204 63 40 / 0.14), rgb(204 63 40 / 0) 55%);
   box-shadow: inset 2px 0 0 var(--fd-watch);
 }
 
@@ -211,8 +215,30 @@
    Foco visível — o projeto não tinha anel de foco em lugar nenhum.
    -------------------------------------------------------------------------- */
 .feed :focus-visible {
-  outline: 2px solid var(--fd-note);
+  outline: 2px solid var(--color-ball);
   outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Campo de busca (SpeciesFilter) — input estilo LCD afundado.
+   -------------------------------------------------------------------------- */
+.fd-input {
+  border: 2px solid var(--fd-line-2);
+  background: var(--fd-surface);
+  color: var(--fd-ink);
+}
+.fd-input::placeholder {
+  color: var(--fd-ink-3);
+}
+
+/* Tag de "de olho em" — espécie observada, vermelho de PokéBola. */
+.fd-watch-tag {
+  border: 1px solid color-mix(in srgb, var(--fd-watch) 45%, transparent);
+  background: color-mix(in srgb, var(--fd-watch) 12%, transparent);
+  color: var(--fd-watch);
+}
+.fd-watch-tag button:hover {
+  background: color-mix(in srgb, var(--fd-watch) 22%, transparent);
 }
 
 /* --------------------------------------------------------------------------

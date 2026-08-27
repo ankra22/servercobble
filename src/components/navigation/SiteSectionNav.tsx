@@ -37,9 +37,9 @@ export function SiteSectionNav() {
     <LineSidebar
       key={pathname}
       items={SECTIONS.map((section) => section.label)}
-      accentColor="#2dd4bf"
-      textColor="#9db3aa"
-      markerColor="#63776e"
+      accentColor="#f2c12e"
+      textColor="#8f9bb8"
+      markerColor="#3e4780"
       showIndex
       showMarker
       proximityRadius={80}
