@@ -21,16 +21,19 @@ create table if not exists public.trainers (
   display_name    text not null,
   skin_url        text,
   badges_count    integer not null default 0,
-  current_series  text,
+  current_series  text default 'kanto',
   created_at      timestamptz not null default now()
 );
 
 -- Migração idempotente pra bancos já provisionados antes desta coluna existir.
 alter table public.trainers add column if not exists current_series text;
+-- Todo treinador novo começa em Kanto (regra do servidor). O coletor também
+-- passa 'kanto' explícito ao criar, mas o default cobre qualquer outro insert.
+alter table public.trainers alter column current_series set default 'kanto';
 
 comment on table public.trainers is 'Jogadores/treinadores do servidor Cobblemon.';
 comment on column public.trainers.username is 'Username exato do Minecraft (usado nas URLs de perfil).';
-comment on column public.trainers.current_series is 'Id da série/região atual do jogador no rctmod (ex.: "kanto") — sincronizado a cada ~60s pelo coletor. Usado pra saber quem está "presente" em cada região em /regioes.';
+comment on column public.trainers.current_series is 'Id da série/região atual do jogador no rctmod (ex.: "kanto") — começa em "kanto" e é sincronizado a cada ~60s pelo coletor (region_snapshot). Usado pra saber quem está "presente" em cada região em /regioes.';
 
 create index if not exists trainers_username_idx on public.trainers (username);
 

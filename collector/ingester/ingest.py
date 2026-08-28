@@ -65,10 +65,18 @@ def is_duplicate_key_error(exc: Exception) -> bool:
     return "duplicate key value" in message or "23505" in message
 
 
+# Todo mundo começa em Kanto no servidor (regra do Cobbleverse). Enquanto o
+# rctmod não sincroniza a região real do jogador (evento region_snapshot, a
+# cada ~60s — e só depois que o rctmod inicializa o progresso dele), o
+# treinador novo já aparece em Kanto em vez de "sem região".
+STARTING_SERIES = "kanto"
+
+
 def upsert_trainer(username: str) -> str:
-    """Retorna o id do treinador, criando-o (com display_name = username) se
-    for a primeira vez que aparece. Nao sobrescreve treinadores existentes
-    (display_name pode ter sido customizado manualmente no Supabase)."""
+    """Retorna o id do treinador, criando-o (com display_name = username e
+    current_series = Kanto) se for a primeira vez que aparece. Nao sobrescreve
+    treinadores existentes (display_name pode ter sido customizado manualmente
+    no Supabase; current_series é atualizado pelo region_snapshot)."""
     existing = (
         supabase.table("trainers")
         .select("id")
@@ -85,6 +93,7 @@ def upsert_trainer(username: str) -> str:
             "username": username,
             "display_name": username,
             "skin_url": skin_url(username),
+            "current_series": STARTING_SERIES,
         })
         .execute()
     )
