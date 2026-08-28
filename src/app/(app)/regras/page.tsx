@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { FixedVideoBackground } from "@/components/video/FixedVideoBackground";
 
 export const metadata: Metadata = { title: "Regras" };
 
@@ -20,12 +19,8 @@ const RULES: Array<{ title: string; text: string }> = [
 
 export default function RegrasPage() {
   return (
-    <div className="relative min-h-full">
-      <FixedVideoBackground src="/regras-reel.mp4" />
-      {/* Scrim marinho sobre o vídeo pra tela ler — o card é opaco de qualquer jeito. */}
-      <div className="pointer-events-none fixed inset-0 z-[1] bg-nv/70" aria-hidden="true" />
-
-      <div className="relative z-10 mx-auto max-w-3xl px-4 py-10 sm:px-6">
+    <div className="min-h-full bg-nv">
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
         <div className="t01-screen p-6 sm:p-8">
           <h1 className="font-pixel text-lg text-route sm:text-xl">Regras</h1>
           <p className="mt-2 font-body text-sm text-lcd-dim">
