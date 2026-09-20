@@ -7,7 +7,13 @@ import { FixedVideoBackground } from "@/components/video/FixedVideoBackground";
 
 const SECTION_NUMBERS = ["01", "02", "03", "04", "05"] as const;
 const SECTION_COUNT = SECTION_NUMBERS.length;
-const TUTORIAL_OPTIONS = ["Minecraft original", "TLauncher"] as const;
+// `href` vazio = tutorial ainda não gravado (o botão fica como "Em breve").
+const TUTORIAL_OPTIONS: ReadonlyArray<{ label: string; href?: string }> = [
+  { label: "Minecraft original", href: "https://youtu.be/JYsl3BKEuaU" },
+  { label: "TLauncher" },
+];
+const TUTORIAL_OPTION_CLASS =
+  "inline-flex items-center justify-center border-2 border-lcd-edge px-4 py-2.5 font-pixel text-[11px] uppercase tracking-wide text-lcd-ink transition-colors hover:border-[color:var(--color-ball)]";
 
 function reveal(active: boolean, delay = "") {
   return `transition-all duration-700 ease-out ${delay} ${active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`;
@@ -202,16 +208,23 @@ export function LandingExperience() {
 
             {tutorialOpen && (
               <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                {TUTORIAL_OPTIONS.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    title="Em breve"
-                    className="inline-flex items-center justify-center border-2 border-lcd-edge px-4 py-2.5 font-pixel text-[11px] uppercase tracking-wide text-lcd-ink transition-colors hover:border-[color:var(--color-ball)]"
-                  >
-                    {option}
-                  </button>
-                ))}
+                {TUTORIAL_OPTIONS.map((option) =>
+                  option.href ? (
+                    <a
+                      key={option.label}
+                      href={option.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={TUTORIAL_OPTION_CLASS}
+                    >
+                      {option.label}
+                    </a>
+                  ) : (
+                    <button key={option.label} type="button" title="Em breve" className={TUTORIAL_OPTION_CLASS}>
+                      {option.label}
+                    </button>
+                  ),
+                )}
               </div>
             )}
           </div>
