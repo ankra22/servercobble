@@ -5,6 +5,7 @@ import { getPokedexEntry, isLocationHidden, POKEDEX, TYPE_LABELS } from "@/lib/p
 import { PokemonSprite } from "@/components/PokemonSprite";
 import { PokemonStats } from "@/components/pokedex/PokemonStats";
 import { EvolutionLine } from "@/components/pokedex/EvolutionLine";
+import { PokemonOwners } from "@/components/pokedex/PokemonOwners";
 import { ChevronMark } from "@/components/icons/Chevron";
 
 interface PageProps {
@@ -116,6 +117,8 @@ export default async function DexEntryPage({ params }: PageProps) {
               </div>
             )}
           </div>
+
+          <PokemonOwners species={entry.id} />
 
           {entry.baseStats && (
             <div className="mt-6 border-t border-lcd-edge/25 pt-5">
