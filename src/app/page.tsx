@@ -4,7 +4,7 @@ import { LandingExperience } from "@/components/landing/LandingExperience";
 export const metadata: Metadata = {
   title: "Cobblemon do Rafaum",
   description:
-    "Servidor privado de Cobblemon. Chegou dezembro, todo mundo de férias e online ao mesmo tempo — chegou a hora de tirar do papel aquele server de Pokémon.",
+    "Servidor privado de Cobblemon. Um site para acompanhar em conjunto os progressos de Pokémon, status e insígnias, e construir uma comunidade juntos.",
 };
 
 export default function LandingPage() {

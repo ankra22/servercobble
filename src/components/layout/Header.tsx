@@ -6,7 +6,6 @@ import { RadarMark } from "@/components/icons/Radar";
 
 const NAV_LINKS = [
   { href: "/", label: "Início" },
-  { href: "/regras", label: "Regras" },
   { href: "/feed", label: "Feed" },
   { href: "/dex", label: "Dex" },
   { href: "/itens", label: "Itens" },

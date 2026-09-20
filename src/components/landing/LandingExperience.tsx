@@ -91,8 +91,9 @@ export function LandingExperience() {
             <p
               className={`${reveal(active === 0, "delay-200")} mt-4 max-w-md text-balance font-body text-sm leading-relaxed text-[#e7eadb] sm:text-base`}
             >
-              Chegou dezembro, todo mundo de férias e online ao mesmo tempo — é agora que a gente
-              finalmente vai atrás daquele server de Pokémon que sempre ficou só na ideia.
+              O Rafaum idealizou e montou esse site simples para que todos os jogadores presentes no
+              servidor consigam acompanhar de forma simultânea os progressos de Pokémon, status,
+              insígnias... e construir uma comunidade juntos.
             </p>
             <button
               type="button"
@@ -111,11 +112,11 @@ export function LandingExperience() {
         <div className="mx-auto flex h-full w-full max-w-3xl flex-col justify-center px-6">
           <SectionHead active={active === 1} number="02" title="O Conceito" />
           <p className={`${reveal(active === 1, "delay-150")} mt-5 max-w-xl text-balance font-body text-base leading-relaxed text-lcd-ink sm:text-lg`}>
-            A gente sempre comentou que devia rolar um server assim com a galera, e agora finalmente
-            saiu do papel. O Cobblemon do Rafaum é o lugar onde todo mundo se encontra, não importa
-            se você já manja de Pokémon de cor ou se nunca encostou num jogo desses, porque aqui cada
-            um vai construir sua própria jornada enquanto divide o mesmo mundo, os mesmos ginásios e
-            as mesmas histórias malucas que vão surgindo no meio do caminho.
+            É, a gente sempre comentou que deveria rolar um server assim com a galera. O Cobblemon
+            do Rafaum é um lugar onde todo mundo vai se encontrar. Não importa se você já manja de
+            Pokémon ou se você nunca gostou de um jogo desses. Porque cada um aqui vai construir sua
+            própria jornada enquanto divide o mesmo mundo. Os mesmos ginásios, as mesmas insígnias.
+            E o mesmo jogo. Que é o nosso querido Minezinho.
           </p>
         </div>
       </Section>
@@ -125,11 +126,10 @@ export function LandingExperience() {
         <div className="mx-auto grid h-full w-full max-w-4xl items-center gap-6 px-6 sm:grid-cols-[minmax(0,220px)_1fr] sm:gap-12">
           <SectionHead active={active === 2} number="03" title="Como Funciona" />
           <p className={`${reveal(active === 2, "delay-150")} text-balance font-body text-base leading-relaxed text-lcd-ink sm:text-lg`}>
-            Ninguém vai ficar mandando em como você joga. Se você quiser sumir sozinho explorando até
-            virar campeão da região, beleza, o jogo é seu. Se preferir chamar todo mundo pra encarar
-            uma rota junto, também é só combinar. As regiões vão sendo liberadas aos poucos conforme o
-            server avança, e cada uma que abre traz Pokémon novos, ginásio novo e mais motivo pra
-            continuar jogando.
+            Ninguém vai ficar mandando em como você joga. Se você quiser jogar sozinho, pode jogar.
+            Se quiser jogar com a galera, também pode jogar. O jogo é seu. As regiões vão sendo
+            liberadas conforme um novo jogador alcança o posto de campeão. E assim o server é
+            reiniciado para passar para a próxima região.
           </p>
         </div>
       </Section>
