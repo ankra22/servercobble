@@ -7,6 +7,7 @@ import { FixedVideoBackground } from "@/components/video/FixedVideoBackground";
 
 const SECTION_NUMBERS = ["01", "02", "03", "04", "05"] as const;
 const SECTION_COUNT = SECTION_NUMBERS.length;
+const TUTORIAL_OPTIONS = ["Minecraft original", "TLauncher"] as const;
 
 function reveal(active: boolean, delay = "") {
   return `transition-all duration-700 ease-out ${delay} ${active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`;
@@ -23,6 +24,7 @@ export function LandingExperience() {
   const shellRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Array<HTMLElement | null>>([]);
   const [active, setActive] = useState(0);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   useEffect(() => {
     const shell = shellRef.current;
@@ -187,21 +189,31 @@ export function LandingExperience() {
             deixamos aqui no site e conectar direto no server. Em poucos minutos você já tá escolhendo
             seu starter e começando sua própria história.
           </p>
-          <div className={`${reveal(active === 4, "delay-300")} mt-8 flex flex-col gap-3 sm:flex-row`}>
+          <div className={`${reveal(active === 4, "delay-300")} mt-8`}>
             <button
               type="button"
-              title="Em breve"
-              className="inline-flex items-center justify-center bg-route px-4 py-2.5 font-pixel text-[11px] uppercase tracking-wide text-route-ink shadow-[4px_4px_0_rgb(12_18_54/0.35)] transition-[transform,box-shadow] duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[1px_1px_0_rgb(12_18_54/0.35)] motion-reduce:transition-none"
-            >
-              Baixar Modpack
-            </button>
-            <button
-              type="button"
-              title="Em breve"
-              className="inline-flex items-center justify-center border-2 border-lcd-edge px-4 py-2.5 font-pixel text-[11px] uppercase tracking-wide text-lcd-ink transition-colors hover:border-[color:var(--color-ball)]"
+              aria-expanded={tutorialOpen}
+              onClick={() => setTutorialOpen((open) => !open)}
+              className="inline-flex items-center justify-center gap-2 bg-route px-4 py-2.5 font-pixel text-[11px] uppercase tracking-wide text-route-ink shadow-[4px_4px_0_rgb(12_18_54/0.35)] transition-[transform,box-shadow] duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[1px_1px_0_rgb(12_18_54/0.35)] motion-reduce:transition-none"
             >
               Ver Tutorial
+              <ChevronMark className={`h-3.5 w-3.5 transition-transform ${tutorialOpen ? "rotate-180" : ""}`} />
             </button>
+
+            {tutorialOpen && (
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                {TUTORIAL_OPTIONS.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    title="Em breve"
+                    className="inline-flex items-center justify-center border-2 border-lcd-edge px-4 py-2.5 font-pixel text-[11px] uppercase tracking-wide text-lcd-ink transition-colors hover:border-[color:var(--color-ball)]"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </Section>
