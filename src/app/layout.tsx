@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Silkscreen, Rubik } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { SiteSectionNav } from "@/components/navigation/SiteSectionNav";
@@ -40,14 +39,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={`${body.variable} ${data.variable} ${pixel.variable} h-full`}>
       <body className="min-h-full antialiased">
-        <ClerkProvider afterSignOutUrl="/feed">
-          <ClickSpark sparkColor="#f2c12e" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
-            <div className="fixed left-6 top-1/2 z-30 hidden -translate-y-1/2 2xl:block">
-              <SiteSectionNav />
-            </div>
-            {children}
-          </ClickSpark>
-        </ClerkProvider>
+        <ClickSpark sparkColor="#f2c12e" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
+          <div className="fixed left-6 top-1/2 z-30 hidden -translate-y-1/2 2xl:block">
+            <SiteSectionNav />
+          </div>
+          {children}
+        </ClickSpark>
         <Analytics />
       </body>
     </html>

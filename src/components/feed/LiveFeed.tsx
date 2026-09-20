@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { FEED_SELECT } from "@/lib/queries/feed";
+import { useWatchedSpecies } from "@/lib/useWatchedSpecies";
 import type { FeedEvent, FeedEventType, FeedEventWithTrainer, Trainer } from "@/lib/database.types";
 import type { ServerStats } from "@/lib/queries/stats";
 import { FeedTimeline } from "@/components/feed/FeedTimeline";
@@ -20,8 +21,6 @@ interface LiveFeedProps {
   /** Esconde os botões de filtro por tipo e a busca por espécie — usado na versão compacta do perfil. */
   showFilters?: boolean;
   emptyMessage?: string;
-  /** Lista de espécies salvas do usuário logado (Clerk) — cada uma destaca o card em vermelho. */
-  initialWatchedSpecies?: string[];
   /** Quando presente, o feed abre com a faixa de status. Só a /feed passa —
    *  o indicador ao vivo mora nela porque `connected` é estado daqui. */
   stats?: ServerStats;
@@ -32,16 +31,15 @@ export function LiveFeed({
   trainerId,
   showFilters = true,
   emptyMessage = "Nenhum evento por aqui ainda. Assim que algo acontecer no servidor, aparece automaticamente.",
-  initialWatchedSpecies = [],
   stats,
 }: LiveFeedProps) {
   const [events, setEvents] = useState(initialEvents);
   const [filter, setFilter] = useState<FeedEventType | "all">("all");
   const [speciesQuery, setSpeciesQuery] = useState("");
   // Separada da busca (`speciesQuery`, temporária) — é a lista de espécies
-  // salva de verdade, usada só pra destacar o card em vermelho quando uma
-  // delas aparecer no feed, mesmo que o usuário esteja buscando outra coisa.
-  const [watchedSpecies, setWatchedSpecies] = useState(initialWatchedSpecies);
+  // salva de verdade (no navegador), usada só pra destacar o card em vermelho
+  // quando uma delas aparecer no feed, mesmo que o jogador esteja buscando outra coisa.
+  const { watchedSpecies, addSpecies, removeSpecies } = useWatchedSpecies();
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(initialEvents.length >= PAGE_SIZE);
   const [newIds, setNewIds] = useState<Set<string>>(new Set());
@@ -152,7 +150,8 @@ export function LiveFeed({
           value={speciesQuery}
           onChange={setSpeciesQuery}
           watchedSpecies={watchedSpecies}
-          onWatchedSpeciesChange={setWatchedSpecies}
+          onAddSpecies={addSpecies}
+          onRemoveSpecies={removeSpecies}
         />
       )}
 

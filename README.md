@@ -15,19 +15,15 @@ insere no Supabase usando a `service_role key`. Os dados do jogo
 ele usa a `anon key` e consome via client Supabase + `postgres_changes`
 (Realtime).
 
-Login é opcional (via [Clerk](https://clerk.com)) e serve só pra salvar
-preferências do usuário (`user_preferences`, ex.: espécie que ele está de
-olho) — essa tabela é a única em que o site escreve, sempre a partir de uma
-Server Action que confere a sessão do Clerk no servidor e usa a
-`service_role key` (nunca a `anon key`, nunca direto do navegador). Ver
-`src/lib/preferences.ts` e `src/lib/supabase/admin.ts`.
+Não há login: o site é totalmente público e não escreve no banco. As
+espécies que o jogador quer acompanhar no feed ficam guardadas no próprio
+navegador (`localStorage`) — ver `src/lib/useWatchedSpecies.ts`.
 
 ## Estrutura do banco
 
 O schema completo está em [`supabase/schema.sql`](./supabase/schema.sql) —
 tabelas `trainers`, `pokemons`, `feed_events` (leitura pública, sem escrita
-pela anon key) e `user_preferences` (sem policy pública nenhuma — só a
-service_role acessa), com índices e a publicação Realtime habilitada em
+pela anon key), com índices e a publicação Realtime habilitada em
 `feed_events`.
 
 ## Rodando localmente
@@ -42,8 +38,7 @@ service_role acessa), com índices e a publicação Realtime habilitada em
    `supabase/schema.sql` no SQL Editor do projeto.
 
 3. Copie o arquivo de exemplo de variáveis de ambiente e preencha (Supabase:
-   Project Settings → API; Clerk: dashboard.clerk.com → API Keys, ou
-   `vercel integration add clerk`):
+   Project Settings → API):
 
    ```bash
    cp .env.local.example .env.local
@@ -70,23 +65,21 @@ src/
   components/
     feed/                       # LiveFeed (realtime), cards, filtros, busca por espécie
     trainer/                    # Cards de treinador/Pokémon, tabs time/PC, badges
-    layout/                     # Header (com login Clerk), Footer
+    layout/                     # Header, Footer
   lib/
-    supabase/                   # Clients: browser + server (anon, leitura) e admin (service_role, só Server Actions)
+    supabase/                   # Clients: browser + server (anon, leitura)
     queries/                    # Funções de leitura (feed, treinadores, stats)
-    preferences.ts              # Server Actions de preferências do usuário logado (Clerk)
+    useWatchedSpecies.ts        # Espécies acompanhadas no feed (localStorage, sem login)
     database.types.ts           # Tipos gerados à mão a partir do schema.sql
-  proxy.ts                      # Ativa a sessão do Clerk (não bloqueia rotas — site continua público)
 collector/                      # Coletor (mod Kotlin + ingestor Python) — ver collector/README.md
 ```
 
 ## Deploy na Vercel
 
 1. Suba o repositório pro GitHub e importe na Vercel (ou use `vercel deploy`).
-2. Configure as env vars do projeto na Vercel — todas as do `.env.local.example`
-   (Supabase + Clerk). Já estão registradas em Development/Production neste
-   projeto (`vercel env ls` pra conferir); `vercel integration add clerk`
-   provisiona as duas do Clerk automaticamente num projeto novo.
+2. Configure as env vars do projeto na Vercel — as do `.env.local.example`
+   (Supabase). Já estão registradas em Development/Production neste
+   projeto (`vercel env ls` pra conferir).
 3. Deploy. Não há build steps extras: é um Next.js padrão. Analytics
    (`@vercel/analytics`) já vem plugado no layout — visitas aparecem no
    dashboard da Vercel assim que o deploy estiver no ar.

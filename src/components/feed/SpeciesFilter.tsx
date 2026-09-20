@@ -1,49 +1,29 @@
 "use client";
 
-import { useTransition } from "react";
-import { useUser } from "@clerk/nextjs";
 import { SearchMark } from "@/components/icons/Search";
-import { addWatchedSpecies, removeWatchedSpecies } from "@/lib/preferences";
 import { toTitleCase } from "@/lib/format";
 
 interface SpeciesFilterProps {
   value: string;
   onChange: (value: string) => void;
-  /** Lista de espécies salvas do usuário logado (lowercase) — controlada pelo pai. */
+  /** Espécies salvas neste navegador (lowercase) — controladas pelo pai. */
   watchedSpecies: string[];
-  onWatchedSpeciesChange: (species: string[]) => void;
+  onAddSpecies: (species: string) => void;
+  onRemoveSpecies: (species: string) => void;
 }
 
 /**
  * Busca por espécie (filtra o que já está carregado no feed) + gerenciamento
- * da lista de espécies que o usuário logado quer acompanhar (destacadas em
+ * da lista de espécies que o jogador quer acompanhar (destacadas em
  * vermelho no feed — ver FeedEventRow).
  */
-export function SpeciesFilter({ value, onChange, watchedSpecies, onWatchedSpeciesChange }: SpeciesFilterProps) {
-  const { isSignedIn } = useUser();
-  const [isPending, startTransition] = useTransition();
-
-  function handleAdd() {
-    const normalized = value.trim().toLowerCase();
-    if (!normalized || watchedSpecies.includes(normalized)) return;
-
-    startTransition(async () => {
-      const result = await addWatchedSpecies(normalized);
-      if (result.ok) {
-        onWatchedSpeciesChange([...watchedSpecies, normalized]);
-      }
-    });
-  }
-
-  function handleRemove(species: string) {
-    startTransition(async () => {
-      const result = await removeWatchedSpecies(species);
-      if (result.ok) {
-        onWatchedSpeciesChange(watchedSpecies.filter((s) => s !== species));
-      }
-    });
-  }
-
+export function SpeciesFilter({
+  value,
+  onChange,
+  watchedSpecies,
+  onAddSpecies,
+  onRemoveSpecies,
+}: SpeciesFilterProps) {
   const alreadyWatched = watchedSpecies.includes(value.trim().toLowerCase());
 
   return (
@@ -60,20 +40,18 @@ export function SpeciesFilter({ value, onChange, watchedSpecies, onWatchedSpecie
           />
         </div>
 
-        {isSignedIn && (
-          <button
-            type="button"
-            onClick={handleAdd}
-            disabled={isPending || !value.trim() || alreadyWatched}
-            title="Adicionar essa espécie à sua lista — destaca em vermelho quando aparecer no feed"
-            className="fd-chip shrink-0 px-3 py-2 text-xs font-medium disabled:opacity-50"
-          >
-            {alreadyWatched ? "Na lista ✓" : "+ Adicionar"}
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => onAddSpecies(value)}
+          disabled={!value.trim() || alreadyWatched}
+          title="Adicionar essa espécie à sua lista — destaca em vermelho quando aparecer no feed"
+          className="fd-chip shrink-0 px-3 py-2 text-xs font-medium disabled:opacity-50"
+        >
+          {alreadyWatched ? "Na lista ✓" : "+ Adicionar"}
+        </button>
       </div>
 
-      {isSignedIn && watchedSpecies.length > 0 && (
+      {watchedSpecies.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="fd-pixel" style={{ color: "var(--fd-ink-3)" }}>De olho em</span>
           {watchedSpecies.map((species) => (
@@ -84,8 +62,7 @@ export function SpeciesFilter({ value, onChange, watchedSpecies, onWatchedSpecie
               {toTitleCase(species)}
               <button
                 type="button"
-                onClick={() => handleRemove(species)}
-                disabled={isPending}
+                onClick={() => onRemoveSpecies(species)}
                 aria-label={`Remover ${toTitleCase(species)} da lista`}
                 className="px-1 leading-none"
               >
