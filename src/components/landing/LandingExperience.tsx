@@ -10,7 +10,7 @@ const SECTION_COUNT = SECTION_NUMBERS.length;
 // `href` vazio = tutorial ainda não gravado (o botão fica como "Em breve").
 const TUTORIAL_OPTIONS: ReadonlyArray<{ label: string; href?: string }> = [
   { label: "Minecraft original", href: "https://youtu.be/JYsl3BKEuaU" },
-  { label: "TLauncher" },
+  { label: "TLauncher", href: "https://youtu.be/bv3XU_C5qMY" },
 ];
 const TUTORIAL_OPTION_CLASS =
   "inline-flex items-center justify-center border-2 border-lcd-edge px-4 py-2.5 font-pixel text-[11px] uppercase tracking-wide text-lcd-ink transition-colors hover:border-[color:var(--color-ball)]";
