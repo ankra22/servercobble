@@ -318,9 +318,14 @@ GYM_RANK_MESSAGE = {
 def process_gym_defeat(event: dict[str, Any]) -> None:
     """Jogador derrotou um líder de ginásio, membro da Elite Four ou o
     campeão de uma região no rctmod (ver RctModGymListener.kt no mod).
-    Incrementa badges_count só pra "gym" e só quando a linha do feed é nova
-    de verdade (não um reprocessamento do mesmo source_event_id) — Elite
-    Four e campeão não contam como insígnia."""
+    Incrementa badges_count só pra "gym", só quando a linha do feed é nova
+    de verdade (não um reprocessamento do mesmo source_event_id) e só na
+    PRIMEIRA vez que esse treinador vence ESSE líder — o rctmod deixa
+    revanchar um líder já derrotado, e cada vitória de revanche dispara
+    BATTLE_ENDED de novo (source_event_id novo, não é duplicata pro banco).
+    Sem essa checagem, cada revanche vira insígnia nova (bug confirmado em
+    2026-09-23: AlanBase_ e noctamour bateram 2x no Brock e o site mostrava
+    3 insígnias). Elite Four e campeão não contam como insígnia."""
     username = event["trainer"]["username"]
     trainer_id = upsert_trainer(username)
     gym_leader_name = event["gym_leader_name"]
@@ -344,6 +349,26 @@ def process_gym_defeat(event: dict[str, Any]) -> None:
         raise
 
     if rank != "gym":
+        return
+
+    # A linha que acabamos de inserir já entra nessa contagem — mais de uma
+    # significa que esse líder específico já tinha sido derrotado antes
+    # (revanche), então essa vitória não rende insígnia de novo.
+    previous_wins = (
+        supabase.table("feed_events")
+        .select("id", count="exact")
+        .eq("trainer_id", trainer_id)
+        .eq("type", "gym_defeat")
+        .eq("rank", "gym")
+        .eq("series", series)
+        .eq("gym_leader_name", gym_leader_name)
+        .execute()
+    )
+    if (previous_wins.count or 0) > 1:
+        log.info(
+            "%s já tinha derrotado %s antes — revanche não conta insígnia de novo.",
+            username, gym_leader_name,
+        )
         return
 
     current = (
