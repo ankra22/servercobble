@@ -281,6 +281,33 @@ def process_breeding(event: dict[str, Any]) -> None:
     })
 
 
+def process_trade(event: dict[str, Any]) -> None:
+    """Troca entre dois jogadores (ver TRADE_EVENT_POST no mod). O evento
+    carrega o Pokémon que `trainer` RECEBEU — `upsert_pokemon` reatribui o
+    `trainer_id` dele pra esse jogador (o `game_uuid` já existe na tabela,
+    de quando foi capturado/chocado pela primeira vez)."""
+    username = event["trainer"]["username"]
+    trainer_id = upsert_trainer(username)
+    pokemon = event["pokemon"]
+    upsert_pokemon(trainer_id, pokemon)
+
+    species_label = title_case(pokemon["species"])
+    partner_username = event.get("partner_username")
+    if partner_username:
+        message = f"{username} recebeu um {species_label} numa troca com {partner_username}."
+    else:
+        message = f"{username} recebeu um {species_label} numa troca."
+
+    insert_feed_event({
+        "type": "trade",
+        "trainer_id": trainer_id,
+        "species": pokemon["species"],
+        "is_shiny": pokemon["is_shiny"],
+        "message": message,
+        "source_event_id": event["source_event_id"],
+    })
+
+
 GYM_RANK_MESSAGE = {
     "gym": "{username} derrotou o líder {name}.",
     "elite_four": "{username} derrotou o membro da Elite Four {name}.",
@@ -365,6 +392,7 @@ HANDLERS = {
     "level_up": process_level_up,
     "rare_spawn": process_rare_spawn,
     "breeding": process_breeding,
+    "trade": process_trade,
     "gym_defeat": process_gym_defeat,
     "region_snapshot": process_region_snapshot,
     "team_snapshot": process_team_snapshot,

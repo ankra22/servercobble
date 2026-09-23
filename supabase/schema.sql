@@ -85,7 +85,8 @@ create table if not exists public.feed_events (
                       'evolution',
                       'level_up',
                       'shiny_found',
-                      'breeding'
+                      'breeding',
+                      'trade'
                     )
                   ),
   trainer_id      uuid references public.trainers (id) on delete cascade,
@@ -108,12 +109,12 @@ alter table public.feed_events add column if not exists rarity text check (rarit
 alter table public.feed_events add column if not exists series text;
 alter table public.feed_events add column if not exists rank text check (rank in ('gym', 'elite_four', 'champion'));
 
--- 'breeding' entrou depois (ovo gerado / ovo chocado). Recria o check do
--- `type` pra bancos já provisionados — o `create table` acima só vale na
--- primeira vez.
+-- 'breeding' e 'trade' entraram depois (ovo gerado/chocado; troca entre
+-- jogadores). Recria o check do `type` pra bancos já provisionados — o
+-- `create table` acima só vale na primeira vez.
 alter table public.feed_events drop constraint if exists feed_events_type_check;
 alter table public.feed_events add constraint feed_events_type_check check (
-  type in ('rare_spawn', 'capture', 'gym_defeat', 'evolution', 'level_up', 'shiny_found', 'breeding')
+  type in ('rare_spawn', 'capture', 'gym_defeat', 'evolution', 'level_up', 'shiny_found', 'breeding', 'trade')
 );
 
 comment on table public.feed_events is 'Linha do tempo de eventos capturados dos logs do servidor, exibida no feed ao vivo.';

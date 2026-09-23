@@ -44,6 +44,11 @@ export const FEED_EVENT_CONFIG: Record<FeedEventType, FeedEventConfig> = {
     tone: "breeding",
     verb: "botou um ovo",
   },
+  trade: {
+    label: "Troca",
+    tone: "capture",
+    verb: "trocou",
+  },
 };
 
 export const FEED_EVENT_ORDER: FeedEventType[] = [
@@ -52,6 +57,7 @@ export const FEED_EVENT_ORDER: FeedEventType[] = [
   "capture",
   "evolution",
   "breeding",
+  "trade",
   "gym_defeat",
   "level_up",
 ];
@@ -71,7 +77,7 @@ export type FeedTier = "highlight" | "standard" | "ambient";
  * capturar um shiny não gera evento `shiny_found` — o selo vem no próprio
  * evento de captura.
  */
-const SHINY_WORTHY: readonly FeedEventType[] = ["capture", "rare_spawn", "evolution", "breeding"];
+const SHINY_WORTHY: readonly FeedEventType[] = ["capture", "rare_spawn", "evolution", "breeding", "trade"];
 
 /* ==========================================================================
    Alerta de lendário — um lendário/mítico aparecendo no server é o evento

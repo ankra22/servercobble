@@ -29,6 +29,8 @@ export function fallbackMessage(event: FeedEventWithTrainer): string {
       return event.species
         ? `${trainer} chocou um ${species}.`
         : `${trainer} conseguiu um ovo.`;
+    case "trade":
+      return `${trainer} recebeu um ${species} numa troca.`;
     default:
       return `${trainer} teve uma novidade com ${species}.`;
   }

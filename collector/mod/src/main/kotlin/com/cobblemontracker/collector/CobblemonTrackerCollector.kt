@@ -5,6 +5,7 @@ import com.cobblemon.mod.common.api.events.CobblemonEvents
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import com.cobblemon.mod.common.trade.PlayerTradeParticipant
 import net.minecraft.server.level.ServerPlayer
 import org.slf4j.LoggerFactory
 
@@ -104,6 +105,27 @@ object CobblemonTrackerCollector : ModInitializer {
             )
             if (owner != null) {
                 TrackerEventWriter.submit(EventFactory.eggHatched(event.pokemon, owner))
+            }
+        }
+
+        // Troca entre dois jogadores. O evento dispara uma vez só, já com o
+        // resultado final dos dois lados: cada TradeParticipant fica com o
+        // Pokémon que RECEBEU (ver EventFactory.trade). Sem isso, o
+        // `trainer_id` no banco nunca mudava quando alguém trocava — o site
+        // continuava mostrando o Pokémon com o dono antigo.
+        CobblemonEvents.TRADE_EVENT_POST.subscribe(Priority.NORMAL) { event ->
+            val player1 = (event.tradeParticipant1 as? PlayerTradeParticipant)?.player
+            val player2 = (event.tradeParticipant2 as? PlayerTradeParticipant)?.player
+
+            if (player1 != null) {
+                TrackerEventWriter.submit(
+                    EventFactory.trade(event.tradeParticipant1Pokemon, player1, player2?.gameProfile?.name),
+                )
+            }
+            if (player2 != null) {
+                TrackerEventWriter.submit(
+                    EventFactory.trade(event.tradeParticipant2Pokemon, player2, player1?.gameProfile?.name),
+                )
             }
         }
 

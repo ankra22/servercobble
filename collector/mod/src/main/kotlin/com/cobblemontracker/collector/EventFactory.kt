@@ -152,6 +152,22 @@ object EventFactory {
     }
 
     /**
+     * Troca entre dois jogadores (GUI de trade nativa do Cobblemon). `pokemon`
+     * é o que `player` RECEBEU — já está no time dele no momento em que o
+     * evento dispara (ver TradeEvent.Post: a troca de posse já aconteceu).
+     * `partnerUsername` é null quando o outro lado não é um jogador (hoje o
+     * servidor só faz troca jogador-a-jogador, mas o Cobblemon permite outros
+     * tipos de TradeParticipant).
+     */
+    fun trade(pokemon: Pokemon, player: ServerPlayer, partnerUsername: String?): JsonObject {
+        val json = base("trade")
+        json.add("trainer", trainerJson(player))
+        json.add("pokemon", pokemonJson(pokemon, player))
+        json.addProperty("partner_username", partnerUsername)
+        return json
+    }
+
+    /**
      * Snapshot periódico do time atual do jogador — não é um evento de feed
      * (não gera card), só serve pra manter `pokemons.location` sincronizado
      * quando alguém move Pokémon entre time/PC sem passar por nenhum dos

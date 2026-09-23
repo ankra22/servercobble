@@ -19,7 +19,8 @@ export type FeedEventType =
   | "evolution"
   | "level_up"
   | "shiny_found"
-  | "breeding";
+  | "breeding"
+  | "trade";
 
 export interface PokemonIVs {
   hp?: number;
