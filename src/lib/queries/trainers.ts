@@ -53,14 +53,20 @@ export interface TrainerCounters {
   totalCaptured: number;
   shinyCount: number;
   evolutions: number;
-  gymDefeats: number;
 }
 
+/**
+ * "Ginásios vencidos" NÃO entra aqui de propósito — antes contava toda linha
+ * `gym_defeat` (inclusive Elite Four/campeão e revanches de líder já
+ * derrotado, que o rctmod permite), inflando o número. `trainers.badges_count`
+ * já é a contagem certa (só líderes, só a primeira vitória contra cada um —
+ * ver process_gym_defeat em ingest.py), então a página usa ele direto.
+ */
 export async function getTrainerCounters(
   supabase: SupabaseClient<Database>,
   trainerId: string,
 ): Promise<TrainerCounters> {
-  const [totalCaptured, shinyCount, evolutions, gymDefeats] = await Promise.all([
+  const [totalCaptured, shinyCount, evolutions] = await Promise.all([
     supabase.from("pokemons").select("*", { count: "exact", head: true }).eq("trainer_id", trainerId),
     supabase
       .from("pokemons")
@@ -72,17 +78,11 @@ export async function getTrainerCounters(
       .select("*", { count: "exact", head: true })
       .eq("trainer_id", trainerId)
       .eq("type", "evolution"),
-    supabase
-      .from("feed_events")
-      .select("*", { count: "exact", head: true })
-      .eq("trainer_id", trainerId)
-      .eq("type", "gym_defeat"),
   ]);
 
   return {
     totalCaptured: totalCaptured.count ?? 0,
     shinyCount: shinyCount.count ?? 0,
     evolutions: evolutions.count ?? 0,
-    gymDefeats: gymDefeats.count ?? 0,
   };
 }

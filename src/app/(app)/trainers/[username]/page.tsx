@@ -90,7 +90,7 @@ export default async function TrainerProfilePage({ params }: PageProps) {
           <StatTile label="Pokémon capturados" value={counters.totalCaptured} />
           <StatTile label="Shinies" value={counters.shinyCount} gold />
           <StatTile label="Evoluções" value={counters.evolutions} />
-          <StatTile label="Ginásios vencidos" value={counters.gymDefeats} />
+          <StatTile label="Ginásios vencidos" value={trainer.badges_count} />
         </section>
 
         <details className="group t01-screen mt-6">
