@@ -260,14 +260,12 @@ def process_breeding(event: dict[str, Any]) -> None:
         return
 
     # stage == "egg"
-    male = event.get("male_parent")
-    female = event.get("female_parent")
+    # Os pais (male_parent/female_parent) NÃO entram na mensagem: o Cobbreeding
+    # dispara COLLECT_EGG com pais sorteados (Arceus × Eiscue num ovo de Ekans),
+    # não os Pokémon reais do pasto. Só egg_species é confiável.
     egg_species = event.get("egg_species")
-    parents = " × ".join(title_case(p) for p in (female, male) if p)
     if egg_species:
-        message = f"{username} conseguiu um ovo de {title_case(egg_species)} ({parents})."
-    elif parents:
-        message = f"{username} conseguiu um ovo ({parents})."
+        message = f"{username} conseguiu um ovo de {title_case(egg_species)}."
     else:
         message = f"{username} conseguiu um ovo."
     insert_feed_event({
