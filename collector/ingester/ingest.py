@@ -101,20 +101,7 @@ def upsert_trainer(username: str) -> str:
 
 
 def upsert_pokemon(trainer_id: str, pokemon: dict[str, Any]) -> None:
-    row = {
-        "trainer_id": trainer_id,
-        "species": pokemon["species"],
-        "nickname": pokemon.get("nickname"),
-        "level": pokemon["level"],
-        "is_shiny": pokemon["is_shiny"],
-        "nature": pokemon.get("nature"),
-        "ability": pokemon.get("ability"),
-        "held_item": pokemon.get("held_item"),
-        "location": pokemon.get("location", "pc"),
-        "ivs": pokemon.get("ivs", {}),
-        "game_uuid": pokemon["game_uuid"],
-    }
-    supabase.table("pokemons").upsert(row, on_conflict="game_uuid").execute()
+    supabase.table("pokemons").upsert(pokemon_row(trainer_id, pokemon), on_conflict="game_uuid").execute()
 
 
 def update_pokemon_by_game_uuid(game_uuid: str, fields: dict[str, Any]) -> None:
@@ -190,12 +177,15 @@ def process_level_up(event: dict[str, Any]) -> None:
     username = event["trainer"]["username"]
     trainer_id = upsert_trainer(username)
     pokemon = event["pokemon"]
+    old_level = event.get("old_level")
+    # `pokemon.level` vem com o nível ANTIGO: o Cobblemon dispara o
+    # LEVEL_UP_EVENT antes de aplicar o nível novo (734 de 734 eventos até
+    # 2026-09-28 tinham level == old_level). `new_level` é o valor certo.
+    new_level = event.get("new_level", pokemon["level"])
     update_pokemon_by_game_uuid(pokemon["game_uuid"], {
-        "level": pokemon["level"],
+        "level": new_level,
         "location": pokemon.get("location", "pc"),
     })
-    old_level = event.get("old_level")
-    new_level = event.get("new_level", pokemon["level"])
     message = f"{title_case(pokemon['species'])} de {username} subiu do nível {old_level} para o nível {new_level}."
     insert_feed_event({
         "type": "level_up",
@@ -388,10 +378,55 @@ def process_region_snapshot(event: dict[str, Any]) -> None:
     supabase.table("trainers").update({"current_series": event["series"]}).eq("id", trainer_id).execute()
 
 
+def pokemon_row(trainer_id: str, pokemon: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "trainer_id": trainer_id,
+        "species": pokemon["species"],
+        "nickname": pokemon.get("nickname"),
+        "level": pokemon["level"],
+        "is_shiny": pokemon["is_shiny"],
+        "nature": pokemon.get("nature"),
+        "ability": pokemon.get("ability"),
+        "held_item": pokemon.get("held_item"),
+        "location": pokemon.get("location", "pc"),
+        "ivs": pokemon.get("ivs", {}),
+        "game_uuid": pokemon["game_uuid"],
+    }
+
+
+SNAPSHOT_CHUNK = 200
+
+
+def process_collection_snapshot(event: dict[str, Any]) -> None:
+    """Time + PC inteiros do jogador (o mod só manda quando algo mudou). Não
+    gera card no feed. Atualiza todos os Pokémon com os dados reais do jogo
+    e apaga do banco os que o treinador não tem mais — soltos (o Cobblemon
+    não tem evento público confiável pra isso) ou saídos por qualquer outro
+    caminho que o coletor não viu."""
+    trainer_id = upsert_trainer(event["trainer"]["username"])
+    pokemons = event.get("pokemons") or []
+    current_uuids = {p["game_uuid"] for p in pokemons}
+
+    rows = [pokemon_row(trainer_id, p) for p in pokemons]
+    for i in range(0, len(rows), SNAPSHOT_CHUNK):
+        supabase.table("pokemons").upsert(rows[i:i + SNAPSHOT_CHUNK], on_conflict="game_uuid").execute()
+
+    stored = (
+        supabase.table("pokemons")
+        .select("game_uuid")
+        .eq("trainer_id", trainer_id)
+        .execute()
+    )
+    gone = [r["game_uuid"] for r in stored.data if r["game_uuid"] and r["game_uuid"] not in current_uuids]
+    for i in range(0, len(gone), SNAPSHOT_CHUNK):
+        supabase.table("pokemons").delete().in_("game_uuid", gone[i:i + SNAPSHOT_CHUNK]).execute()
+    if gone:
+        log.info("%s não tem mais %d Pokémon (soltos?) — removidos.", event["trainer"]["username"], len(gone))
+
+
 def process_team_snapshot(event: dict[str, Any]) -> None:
-    """Sincroniza `location` com o time atual do jogador (roda a cada ~60s
-    pelo mod). Não gera card no feed — só corrige o time/PC de quem moveu
-    Pokémon sem passar por captura/evolução/level up."""
+    """Formato antigo (só UUIDs do time), substituído por collection_snapshot.
+    Continua aqui pra reprocessar linhas antigas do events.jsonl sem erro."""
     trainer_id = upsert_trainer(event["trainer"]["username"])
     team_uuids = event.get("team_game_uuids") or []
 
@@ -419,6 +454,7 @@ HANDLERS = {
     "gym_defeat": process_gym_defeat,
     "region_snapshot": process_region_snapshot,
     "team_snapshot": process_team_snapshot,
+    "collection_snapshot": process_collection_snapshot,
 }
 
 

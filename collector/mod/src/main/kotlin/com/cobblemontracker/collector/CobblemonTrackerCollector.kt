@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import com.cobblemon.mod.common.trade.PlayerTradeParticipant
 import net.minecraft.server.level.ServerPlayer
 import org.slf4j.LoggerFactory
+import java.util.UUID
 
 /**
  * Ponto de entrada do mod complementar do Cobblemon Tracker.
@@ -23,6 +24,9 @@ object CobblemonTrackerCollector : ModInitializer {
     /** ~60s a 20 TPS (menos, se o servidor estiver lento — sem problema, é só o intervalo do sync de time/PC). */
     private const val TEAM_SYNC_INTERVAL_TICKS = 1200
     private var tickCounter = 0
+
+    /** Último time+PC emitido por jogador (JSON serializado), pra não repetir snapshot igual. */
+    private val lastCollection = HashMap<UUID, String>()
 
     override fun onInitialize() {
         TrackerEventWriter.start()
@@ -134,7 +138,14 @@ object CobblemonTrackerCollector : ModInitializer {
             if (tickCounter >= TEAM_SYNC_INTERVAL_TICKS) {
                 tickCounter = 0
                 for (player in server.playerList.players) {
-                    TrackerEventWriter.submit(EventFactory.teamSnapshot(player))
+                    // Só grava quando time/PC mudou desde o último snapshot
+                    // desse jogador — senão seria o PC inteiro a cada minuto.
+                    val pokemons = EventFactory.collectionPokemons(player)
+                    val serialized = pokemons.toString()
+                    if (lastCollection[player.uuid] != serialized) {
+                        lastCollection[player.uuid] = serialized
+                        TrackerEventWriter.submit(EventFactory.collectionSnapshot(player, pokemons))
+                    }
                     val series = RctModGymListener.currentSeriesFor(player)
                     if (series != null) {
                         TrackerEventWriter.submit(EventFactory.regionSnapshot(player, series))

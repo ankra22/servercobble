@@ -167,14 +167,6 @@ object EventFactory {
         return json
     }
 
-    /**
-     * Snapshot periódico do time atual do jogador — não é um evento de feed
-     * (não gera card), só serve pra manter `pokemons.location` sincronizado
-     * quando alguém move Pokémon entre time/PC sem passar por nenhum dos
-     * eventos acima (o Cobblemon não expõe um evento público pra isso).
-     * O ingestor marca esses `game_uuid`s como "team" e todo o resto do
-     * treinador como "pc".
-     */
     /** Jogador derrotou um líder de ginásio, Elite Four ou campeão do rctmod. `rank`: "gym" | "elite_four" | "champion". */
     fun gymDefeat(player: ServerPlayer, gymLeaderName: String, series: String, rank: String): JsonObject {
         val json = base("gym_defeat")
@@ -193,14 +185,32 @@ object EventFactory {
         return json
     }
 
-    fun teamSnapshot(player: ServerPlayer): JsonObject {
-        val json = base("team_snapshot")
-        json.add("trainer", trainerJson(player))
-        val uuids = JsonArray()
+    /**
+     * Lista completa do que o jogador tem agora (time + PC), com os dados de
+     * cada Pokémon. Separada de `collectionSnapshot` pra quem chama poder
+     * comparar com o snapshot anterior e só emitir quando algo mudou.
+     */
+    fun collectionPokemons(player: ServerPlayer): JsonArray {
+        val pokemons = JsonArray()
         for (pokemon in Cobblemon.storage.getParty(player)) {
-            uuids.add(pokemon.uuid.toString())
+            pokemons.add(wildPokemonJson(pokemon).apply { addProperty("location", "team") })
         }
-        json.add("team_game_uuids", uuids)
+        for (pokemon in Cobblemon.storage.getPC(player)) {
+            pokemons.add(wildPokemonJson(pokemon).apply { addProperty("location", "pc") })
+        }
+        return pokemons
+    }
+
+    /**
+     * Snapshot do time + PC inteiros do jogador — não gera card no feed. O
+     * ingestor atualiza cada Pokémon (nível, espécie, IVs, local...) e APAGA
+     * do banco os que o treinador não tem mais (soltos). Sem isso, Pokémon
+     * solto ficava pra sempre no site, e nível/local só mudavam via evento.
+     */
+    fun collectionSnapshot(player: ServerPlayer, pokemons: JsonArray): JsonObject {
+        val json = base("collection_snapshot")
+        json.add("trainer", trainerJson(player))
+        json.add("pokemons", pokemons)
         return json
     }
 }
