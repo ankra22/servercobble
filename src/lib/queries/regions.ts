@@ -12,10 +12,21 @@ export interface RegionTrainerProgress {
 }
 
 /**
+ * Uma linha `gym_defeat` só vale insígnia se for contra líder (Elite Four e
+ * campeão também geram `gym_defeat`; `rank` nulo = evento antigo, de antes da
+ * coluna existir, sempre líder).
+ */
+function isGymLeaderDefeat(rank: string | null): boolean {
+  return rank === null || rank === "gym";
+}
+
+/**
  * Treinadores atualmente "presentes" numa região (série atual no rctmod,
  * sincronizada a cada ~60s pelo coletor via `trainers.current_series`),
  * junto com os ginásios que cada um já venceu ali — o mais recente é o
- * "atual" (ginásio mais avançado que ele já bateu nessa região).
+ * "atual" (ginásio mais avançado que ele já bateu nessa região). O rctmod
+ * deixa revanchar líder já derrotado e cada revanche gera outro
+ * `gym_defeat`, então cada líder só conta uma vez (a primeira vitória).
  */
 export async function getRegionProgress(
   supabase: SupabaseClient<Database>,
@@ -29,7 +40,7 @@ export async function getRegionProgress(
       .order("badges_count", { ascending: false }),
     supabase
       .from("feed_events")
-      .select("trainer_id, gym_leader_name, created_at")
+      .select("trainer_id, gym_leader_name, rank, created_at")
       .eq("type", "gym_defeat")
       .eq("series", seriesId)
       .order("created_at", { ascending: true }),
@@ -45,8 +56,9 @@ export async function getRegionProgress(
 
   const badgesByTrainer = new Map<string, RegionGymBadge[]>();
   for (const row of eventsRes.data ?? []) {
-    if (!row.trainer_id || !row.gym_leader_name) continue;
+    if (!row.trainer_id || !row.gym_leader_name || !isGymLeaderDefeat(row.rank)) continue;
     const list = badgesByTrainer.get(row.trainer_id) ?? [];
+    if (list.some((badge) => badge.gymLeaderName === row.gym_leader_name)) continue;
     list.push({ gymLeaderName: row.gym_leader_name, defeatedAt: row.created_at });
     badgesByTrainer.set(row.trainer_id, list);
   }
@@ -57,14 +69,14 @@ export async function getRegionProgress(
   }));
 }
 
-/** Nomes dos líderes de ginásio vencidos por um treinador, agrupados por região. */
+/** Nomes dos líderes de ginásio vencidos por um treinador, agrupados por região (sem repetir revanche). */
 export async function getTrainerGymProgress(
   supabase: SupabaseClient<Database>,
   trainerId: string,
 ): Promise<Record<string, string[]>> {
   const { data, error } = await supabase
     .from("feed_events")
-    .select("series, gym_leader_name")
+    .select("series, gym_leader_name, rank")
     .eq("type", "gym_defeat")
     .eq("trainer_id", trainerId);
 
@@ -75,8 +87,9 @@ export async function getTrainerGymProgress(
 
   const byRegion: Record<string, string[]> = {};
   for (const row of data ?? []) {
-    if (!row.series || !row.gym_leader_name) continue;
-    (byRegion[row.series] ??= []).push(row.gym_leader_name);
+    if (!row.series || !row.gym_leader_name || !isGymLeaderDefeat(row.rank)) continue;
+    const names = (byRegion[row.series] ??= []);
+    if (!names.includes(row.gym_leader_name)) names.push(row.gym_leader_name);
   }
   return byRegion;
 }
